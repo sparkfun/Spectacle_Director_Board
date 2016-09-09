@@ -19796,7 +19796,9 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <part name="C3" library="SparkFun-Capacitors" deviceset="10PF-50V-5%(0603)" device="" value="10pF"/>
 <part name="C4" library="SparkFun-Capacitors" deviceset="10PF-50V-5%(0603)" device="" value="10pF"/>
 <part name="C5" library="SparkFun-Capacitors" deviceset="10NF/10000PF-50V-10%(0603)" device="" value="10nF"/>
-<part name="R2" library="SparkFun-Passives" deviceset="RESISTOR" device="0603-RES" value="14k"/>
+<part name="R2" library="SparkFun-Passives" deviceset="RESISTOR" device="0603-RES" value="14k">
+<attribute name="PROD_ID" value="RES-13340"/>
+</part>
 <part name="GND3" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND35" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND36" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
@@ -19995,7 +19997,9 @@ near U1.17</text>
 <instance part="C3" gate="G$1" x="50.8" y="129.54" rot="R90"/>
 <instance part="C4" gate="G$1" x="50.8" y="124.46" rot="MR270"/>
 <instance part="C5" gate="G$1" x="60.96" y="78.74" rot="R180"/>
-<instance part="R2" gate="G$1" x="66.04" y="76.2" rot="R90"/>
+<instance part="R2" gate="G$1" x="66.04" y="76.2" rot="R90">
+<attribute name="PROD_ID" x="66.04" y="76.2" size="1.778" layer="96" rot="R90" display="off"/>
+</instance>
 <instance part="GND3" gate="1" x="71.12" y="63.5"/>
 <instance part="GND35" gate="1" x="238.76" y="154.94" rot="MR0"/>
 <instance part="GND36" gate="1" x="289.56" y="154.94" rot="MR0"/>
