@@ -16873,6 +16873,7 @@ Manufacturer: Hirose&lt;br&gt;&lt;br&gt;
 <wire x1="7" y1="3.3" x2="9.4" y2="3.3" width="0.254" layer="21"/>
 <wire x1="4" y1="3.3" x2="5.4" y2="3.3" width="0.254" layer="21"/>
 <wire x1="0.5" y1="3.3" x2="2.4" y2="3.3" width="0.254" layer="21"/>
+<text x="3.81" y="-2.54" size="0.4064" layer="25">&gt;NAME</text>
 </package>
 </packages>
 <symbols>
@@ -19026,8 +19027,6 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <part name="R8" library="SparkFun-Resistors" deviceset="330OHM1/10W1%(0603)" device="" value="330"/>
 <part name="GND37" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="LOGO2" library="SparkFun-Aesthetics" deviceset="OSHW-LOGO" device="MINI" value="OSHW-LOGOMINI"/>
-<part name="R15" library="SparkFun-Resistors" deviceset="10KOHM1/10W1%(0603)" device="0603" value="10K"/>
-<part name="SUPPLY5" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
 <part name="U1" library="SparkFun-DigitalIC" deviceset="CY7C65213" device=""/>
 <part name="C2" library="SparkFun-Capacitors" deviceset="1.0UF-16V-10%(0603)" device="" value="1.0uF"/>
 <part name="SUPPLY17" library="SparkFun-Aesthetics" deviceset="VDD" device=""/>
@@ -19076,6 +19075,9 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <part name="R2" library="SparkFun-Resistors" deviceset="20KOHM1/10W1%(0603)" device="" value="20k"/>
 <part name="R7" library="SparkFun-Resistors" deviceset="10KOHM-1/10W-1%(0603)" device="0603" value="10K"/>
 <part name="SUPPLY25" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
+<part name="C14" library="SparkFun-Capacitors" deviceset="1.0UF-16V-10%(0603)" device="" value="1.0uF"/>
+<part name="GND13" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
+<part name="SUPPLY5" library="SparkFun-Aesthetics" deviceset="3.3V" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -19136,7 +19138,7 @@ GPIO0 determines boot mode</text>
 <text x="332.74" y="104.14" size="2.54" layer="97" align="top-left">Reset Button</text>
 <text x="261.62" y="137.16" size="2.54" layer="97" align="top-left">GPIO5 LED</text>
 <text x="200.66" y="104.14" size="2.54" layer="97" align="top-left">Output Jacks</text>
-<text x="421.64" y="10.16" size="2.54" layer="94" align="top-left">v01</text>
+<text x="421.64" y="10.16" size="2.54" layer="94" align="top-left">v02</text>
 <text x="355.6" y="10.16" size="2.54" layer="94" align="top-left">Mike Hord</text>
 <wire x1="431.8" y1="66.04" x2="330.2" y2="66.04" width="0.2032" layer="97" style="longdash"/>
 <text x="209.042" y="233.68" size="0.8128" layer="97">C12 and C13 to be
@@ -19146,6 +19148,8 @@ near U1.20</text>
 <text x="173.482" y="233.68" size="0.8128" layer="97">C2 to be
 near U1.17</text>
 <wire x1="259.08" y1="106.68" x2="330.2" y2="106.68" width="0.2032" layer="97" style="longdash"/>
+<text x="254" y="91.44" size="1.778" layer="97">JP1 and JP2 disable
+I2C pull-up resistors</text>
 </plain>
 <instances>
 <instance part="SUPPLY1" gate="G$1" x="68.58" y="160.02"/>
@@ -19240,9 +19244,7 @@ near U1.17</text>
 <instance part="R8" gate="G$1" x="307.34" y="124.46" rot="R90"/>
 <instance part="GND37" gate="1" x="307.34" y="114.3"/>
 <instance part="LOGO2" gate="G$1" x="182.88" y="10.16"/>
-<instance part="R15" gate="G$1" x="347.98" y="127" rot="R270"/>
-<instance part="SUPPLY5" gate="G$1" x="347.98" y="134.62"/>
-<instance part="U1" gate="G$1" x="363.22" y="213.36"/>
+<instance part="U1" gate="G$1" x="365.76" y="213.36"/>
 <instance part="C2" gate="G$1" x="172.72" y="238.76"/>
 <instance part="SUPPLY17" gate="VDD" x="172.72" y="251.46"/>
 <instance part="GND4" gate="1" x="172.72" y="220.98"/>
@@ -19297,6 +19299,9 @@ near U1.17</text>
 <instance part="R2" gate="G$1" x="55.88" y="76.2"/>
 <instance part="R7" gate="G$1" x="373.38" y="53.34" rot="R90"/>
 <instance part="SUPPLY25" gate="G$1" x="373.38" y="60.96"/>
+<instance part="C14" gate="G$1" x="30.48" y="22.86"/>
+<instance part="GND13" gate="1" x="30.48" y="15.24"/>
+<instance part="SUPPLY5" gate="G$1" x="30.48" y="30.48"/>
 </instances>
 <busses>
 </busses>
@@ -19370,11 +19375,6 @@ near U1.17</text>
 <wire x1="157.48" y1="30.48" x2="157.48" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="SUPPLY5" gate="G$1" pin="3.3V"/>
-<pinref part="R15" gate="G$1" pin="1"/>
-<wire x1="347.98" y1="134.62" x2="347.98" y2="132.08" width="0.1524" layer="91"/>
-</segment>
-<segment>
 <pinref part="C12" gate="G$1" pin="1"/>
 <wire x1="208.28" y1="243.84" x2="208.28" y2="248.92" width="0.1524" layer="91"/>
 <pinref part="C13" gate="G$1" pin="1"/>
@@ -19386,7 +19386,7 @@ near U1.17</text>
 </segment>
 <segment>
 <pinref part="U1" gate="G$1" pin="VCCIO"/>
-<wire x1="358.14" y1="241.3" x2="347.98" y2="241.3" width="0.1524" layer="91"/>
+<wire x1="360.68" y1="241.3" x2="347.98" y2="241.3" width="0.1524" layer="91"/>
 <wire x1="347.98" y1="241.3" x2="347.98" y2="266.7" width="0.1524" layer="91"/>
 <pinref part="SUPPLY20" gate="G$1" pin="3.3V"/>
 </segment>
@@ -19415,6 +19415,11 @@ near U1.17</text>
 <pinref part="SUPPLY25" gate="G$1" pin="3.3V"/>
 <pinref part="R7" gate="G$1" pin="2"/>
 <wire x1="373.38" y1="60.96" x2="373.38" y2="58.42" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C14" gate="G$1" pin="1"/>
+<wire x1="30.48" y1="27.94" x2="30.48" y2="30.48" width="0.1524" layer="91"/>
+<pinref part="SUPPLY5" gate="G$1" pin="3.3V"/>
 </segment>
 </net>
 <net name="CHIP_PU" class="0">
@@ -19632,6 +19637,11 @@ near U1.17</text>
 <wire x1="256.54" y1="35.56" x2="259.08" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="259.08" y1="35.56" x2="259.08" y2="33.02" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="C14" gate="G$1" pin="2"/>
+<pinref part="GND13" gate="1" pin="GND"/>
+<wire x1="30.48" y1="20.32" x2="30.48" y2="17.78" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="LNA_IN" class="0">
 <segment>
@@ -19801,7 +19811,8 @@ near U1.17</text>
 </segment>
 <segment>
 <label x="393.7" y="254" size="1.27" layer="95" xref="yes"/>
-<wire x1="388.62" y1="254" x2="393.7" y2="254" width="0.1524" layer="91"/>
+<wire x1="391.16" y1="254" x2="393.7" y2="254" width="0.1524" layer="91"/>
+<pinref part="U1" gate="G$1" pin="TXD"/>
 </segment>
 </net>
 <net name="U0TXD" class="0">
@@ -19813,7 +19824,7 @@ near U1.17</text>
 <segment>
 <label x="393.7" y="251.46" size="1.27" layer="95" xref="yes"/>
 <pinref part="U1" gate="G$1" pin="RXD"/>
-<wire x1="388.62" y1="251.46" x2="393.7" y2="251.46" width="0.1524" layer="91"/>
+<wire x1="391.16" y1="251.46" x2="393.7" y2="251.46" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="TRACE_ANT" class="0">
@@ -19832,7 +19843,7 @@ near U1.17</text>
 <segment>
 <label x="393.7" y="241.3" size="1.27" layer="95" xref="yes"/>
 <pinref part="U1" gate="G$1" pin="DTR"/>
-<wire x1="388.62" y1="241.3" x2="393.7" y2="241.3" width="0.1524" layer="91"/>
+<wire x1="391.16" y1="241.3" x2="393.7" y2="241.3" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="R17" gate="G$1" pin="1"/>
@@ -19880,7 +19891,7 @@ near U1.17</text>
 </segment>
 <segment>
 <pinref part="U1" gate="G$1" pin="VCC"/>
-<wire x1="358.14" y1="246.38" x2="355.6" y2="246.38" width="0.1524" layer="91"/>
+<wire x1="360.68" y1="246.38" x2="355.6" y2="246.38" width="0.1524" layer="91"/>
 <pinref part="SUPPLY21" gate="G$1" pin="V_USB"/>
 <wire x1="355.6" y1="269.24" x2="355.6" y2="246.38" width="0.1524" layer="91"/>
 </segment>
@@ -19916,7 +19927,7 @@ near U1.17</text>
 <segment>
 <label x="393.7" y="246.38" size="1.27" layer="95" xref="yes"/>
 <pinref part="U1" gate="G$1" pin="CTS"/>
-<wire x1="388.62" y1="246.38" x2="393.7" y2="246.38" width="0.1524" layer="91"/>
+<wire x1="391.16" y1="246.38" x2="393.7" y2="246.38" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="R18" gate="G$1" pin="1"/>
@@ -19975,14 +19986,10 @@ near U1.17</text>
 </net>
 <net name="0" class="0">
 <segment>
-<wire x1="375.92" y1="114.3" x2="347.98" y2="114.3" width="0.1524" layer="91"/>
+<wire x1="375.92" y1="114.3" x2="342.9" y2="114.3" width="0.1524" layer="91"/>
 <label x="342.9" y="114.3" size="1.27" layer="95" rot="R180" xref="yes"/>
 <pinref part="Q2" gate="Q2" pin="C"/>
-<wire x1="347.98" y1="114.3" x2="342.9" y2="114.3" width="0.1524" layer="91"/>
 <wire x1="375.92" y1="114.3" x2="375.92" y2="116.84" width="0.1524" layer="91"/>
-<pinref part="R15" gate="G$1" pin="2"/>
-<wire x1="347.98" y1="121.92" x2="347.98" y2="114.3" width="0.1524" layer="91"/>
-<junction x="347.98" y="114.3"/>
 </segment>
 <segment>
 <wire x1="175.26" y1="147.32" x2="177.8" y2="147.32" width="0.1524" layer="91"/>
@@ -20114,7 +20121,7 @@ near U1.17</text>
 </segment>
 <segment>
 <pinref part="U1" gate="G$1" pin="VCCD"/>
-<wire x1="358.14" y1="243.84" x2="350.52" y2="243.84" width="0.1524" layer="91"/>
+<wire x1="360.68" y1="243.84" x2="350.52" y2="243.84" width="0.1524" layer="91"/>
 <wire x1="350.52" y1="243.84" x2="350.52" y2="261.62" width="0.1524" layer="91"/>
 <pinref part="SUPPLY7" gate="VDD" pin="VDD"/>
 </segment>
@@ -20155,14 +20162,14 @@ near U1.17</text>
 <segment>
 <pinref part="JP15" gate="G$1" pin="D-"/>
 <pinref part="U1" gate="G$1" pin="USBDM"/>
-<wire x1="284.48" y1="254" x2="358.14" y2="254" width="0.1524" layer="91"/>
+<wire x1="284.48" y1="254" x2="360.68" y2="254" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$8" class="0">
 <segment>
 <pinref part="JP15" gate="G$1" pin="D+"/>
 <pinref part="U1" gate="G$1" pin="USBDP"/>
-<wire x1="284.48" y1="251.46" x2="358.14" y2="251.46" width="0.1524" layer="91"/>
+<wire x1="284.48" y1="251.46" x2="360.68" y2="251.46" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$11" class="0">
