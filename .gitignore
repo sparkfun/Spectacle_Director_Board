@@ -34,3 +34,7 @@ eagle.epf
 *.info
 
 *.eps
+
+# ESP-IDF Firmware Builds
+Firmware/Spectacle_Director_Firmware/build/
+sdkconfig.old
