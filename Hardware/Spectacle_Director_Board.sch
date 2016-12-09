@@ -21746,7 +21746,7 @@ Interface</text>
 </instance>
 <instance part="GND26" gate="1" x="30.48" y="149.86"/>
 <instance part="F1" gate="G$1" x="38.1" y="175.26"/>
-<instance part="JP15" gate="G$1" x="20.32" y="167.64" rot="MR0"/>
+<instance part="JP15" gate="G$1" x="20.32" y="162.56" rot="MR0"/>
 <instance part="GND15" gate="1" x="73.66" y="160.02"/>
 <instance part="C7" gate="G$1" x="68.58" y="167.64" rot="MR0"/>
 <instance part="C10" gate="G$1" x="101.6" y="167.64"/>
@@ -21997,8 +21997,8 @@ Interface</text>
 </segment>
 <segment>
 <pinref part="GND26" gate="1" pin="GND"/>
-<wire x1="30.48" y1="162.56" x2="30.48" y2="152.4" width="0.1524" layer="91"/>
-<wire x1="30.48" y1="162.56" x2="27.94" y2="162.56" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="157.48" x2="30.48" y2="152.4" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="157.48" x2="27.94" y2="157.48" width="0.1524" layer="91"/>
 <pinref part="JP15" gate="G$1" pin="GND"/>
 </segment>
 <segment>
@@ -22182,8 +22182,8 @@ Interface</text>
 </net>
 <net name="VUSB" class="0">
 <segment>
-<wire x1="27.94" y1="172.72" x2="30.48" y2="172.72" width="0.1524" layer="91"/>
-<wire x1="30.48" y1="172.72" x2="30.48" y2="175.26" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="167.64" x2="30.48" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="167.64" x2="30.48" y2="175.26" width="0.1524" layer="91"/>
 <wire x1="30.48" y1="175.26" x2="33.02" y2="175.26" width="0.1524" layer="91"/>
 <pinref part="F1" gate="G$1" pin="1"/>
 <pinref part="JP15" gate="G$1" pin="VCC"/>
@@ -22192,8 +22192,8 @@ Interface</text>
 <net name="SHIELD" class="0">
 <segment>
 <pinref part="JP15" gate="G$1" pin="SHIELD"/>
-<wire x1="12.7" y1="167.64" x2="10.16" y2="167.64" width="0.1524" layer="91"/>
-<label x="10.16" y="167.64" size="1.27" layer="95" rot="R180" xref="yes"/>
+<wire x1="12.7" y1="162.56" x2="10.16" y2="162.56" width="0.1524" layer="91"/>
+<label x="10.16" y="162.56" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="N$2" class="0">
@@ -22279,8 +22279,8 @@ Interface</text>
 </segment>
 <segment>
 <pinref part="JP15" gate="G$1" pin="D+"/>
-<wire x1="27.94" y1="167.64" x2="30.48" y2="167.64" width="0.1524" layer="91"/>
-<label x="30.48" y="167.64" size="1.27" layer="95" xref="yes"/>
+<wire x1="27.94" y1="162.56" x2="30.48" y2="162.56" width="0.1524" layer="91"/>
+<label x="30.48" y="162.56" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="USB_D-" class="0">
@@ -22291,8 +22291,8 @@ Interface</text>
 </segment>
 <segment>
 <pinref part="JP15" gate="G$1" pin="D-"/>
-<wire x1="27.94" y1="170.18" x2="30.48" y2="170.18" width="0.1524" layer="91"/>
-<label x="30.48" y="170.18" size="1.27" layer="95" xref="yes"/>
+<wire x1="27.94" y1="165.1" x2="30.48" y2="165.1" width="0.1524" layer="91"/>
+<label x="30.48" y="165.1" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="D6_BTN2" class="0">
@@ -22591,6 +22591,12 @@ Interface</text>
 <pinref part="Q1" gate="G$1" pin="D"/>
 <wire x1="223.52" y1="119.38" x2="223.52" y2="121.92" width="0.1524" layer="91"/>
 <pinref part="D1" gate="G$1" pin="C"/>
+</segment>
+</net>
+<net name="USB_ID" class="0">
+<segment>
+<pinref part="JP15" gate="G$1" pin="ID"/>
+<wire x1="27.94" y1="160.02" x2="30.48" y2="160.02" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
