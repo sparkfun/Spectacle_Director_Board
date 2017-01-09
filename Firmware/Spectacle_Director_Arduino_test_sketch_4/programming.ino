@@ -15,7 +15,7 @@ void receiveFile()
   
   uint32_t lastReceiveTime = millis();
 
-  //We assume the serial receive part is finished when we have not received something for 3 seconds
+  //We assume the serial receive part is finished when we have not received something for 30 seconds
   while(Serial1.available() || lastReceiveTime + 30000 > millis())
   {
     uint16_t available = Serial1.readBytes(usbBuffer, USB_BUFFER_SIZE);
@@ -124,7 +124,7 @@ void loadFile()
 
   // i2c_addr will be incremented with each new board that comes
   //  online. We'll connect to the board, assign it a new I2C address,
-  //  then check that it matches the expected I2C address from the file.
+  //  then check that it matches the expected board ID from the file.
   int i2c_addr = 0x09;
   while (1)
   {
@@ -198,12 +198,12 @@ void loadFile()
       i+=2; // Index past 'n' and '\n'.
       sendByte(i2c_addr, DATA_READY_REG, 1); // tell daughter board we've got
                                              //  a config set for it.
+      byte remoteAddr = 128; // starting location of the I2C remote memory area
+                               //  that we'll be writing to.
       while (1) // do this until we break, upon discovery of an 'N', 'n', or 'Y'.
       {
         // First, we must figure out how many bytes we need to transmit.
         char bytes = fileBuffer[i];
-        byte remoteAddr = 128; // starting location of the I2C remote memory area
-                               //  that we'll be writing to.
         i+=2; // Index past the # of bytes and the period that follows it.
         // Read one line into the short buffer.
         j = 0; // reset the short buffer's index
@@ -234,16 +234,17 @@ void loadFile()
           default:
           dataIntegrityError();
         }
-        while (dataAccepted(i2c_addr) == 1); // Wait for data to be accepted by
-                                            //  daughter board.
         i++; // index past the '\n' character
         if (fileBuffer[i] == 'N' ||
             fileBuffer[i] == 'n' ||
             fileBuffer[i] == 'Y')
         {
+          Serial1.println(fileBuffer[i]);
           break;
         }
       }
+      while (dataAccepted(i2c_addr) == 1); // Wait for data to be accepted by
+                                            //  daughter board.
     }
     // ANY OTHER CHARACTER indicates a data integrity error.
     else

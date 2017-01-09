@@ -9,6 +9,6 @@
 #define BYTE_SEPARATOR    0x58
 
 //Buffer sizes
-#define USB_BUFFER_SIZE      128
+#define USB_BUFFER_SIZE      32
 #define FLASH_BUFFER_SIZE    4096
 
