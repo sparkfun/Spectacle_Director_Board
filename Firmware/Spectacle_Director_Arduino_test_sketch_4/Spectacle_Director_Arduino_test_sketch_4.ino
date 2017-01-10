@@ -68,7 +68,7 @@ void setup()
 
 void loop() 
 {
-  for (int i = 0; i < 5; i++)
+  for (int i = 0; i < 7; i++)
   {
     sendCmd(AUD_ADDR, i, getMail(BTN_ADDR, i));
     delay(10);

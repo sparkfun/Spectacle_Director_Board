@@ -38,7 +38,7 @@ void receiveFile()
           delay(500);
         }
         Serial1.println("Done formatting flash.");
-        SerialFlash.create(filename, 5000);
+        SerialFlash.createErasable(filename, 5000);
         file = SerialFlash.open(filename);
         if (!file) Serial1.println("Couldn't open file!");
         state = STATE_CONTENT;
@@ -196,8 +196,6 @@ void loadFile()
     else if (fileBuffer[i] == 'n')
     {
       i+=2; // Index past 'n' and '\n'.
-      sendByte(i2c_addr, DATA_READY_REG, 1); // tell daughter board we've got
-                                             //  a config set for it.
       byte remoteAddr = 128; // starting location of the I2C remote memory area
                                //  that we'll be writing to.
       while (1) // do this until we break, upon discovery of an 'N', 'n', or 'Y'.
@@ -243,6 +241,9 @@ void loadFile()
           break;
         }
       }
+      sendByte(i2c_addr, DATA_READY_REG, 1); // tell daughter board we've got
+                                             //  a config set for it.
+      Serial1.println("waiting for daughter board");
       while (dataAccepted(i2c_addr) == 1); // Wait for data to be accepted by
                                             //  daughter board.
     }
