@@ -7,7 +7,7 @@ int getMail(byte address, byte mailbox)
   while (Wire.available() < 2);
   int temp = Wire.read();
   temp |= Wire.read()<<8;
-  if (temp > 0) Serial1.println(address);
+  //if (temp > 0) Serial1.println(address);
   return temp;
 }
 

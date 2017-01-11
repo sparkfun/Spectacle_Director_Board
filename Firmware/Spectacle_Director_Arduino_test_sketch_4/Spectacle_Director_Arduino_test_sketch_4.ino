@@ -2,6 +2,7 @@
 #include "dbt.h"
 #include <SerialFlash.h>
 #include <SPI.h>
+#include "boards.h"
 
 #define AUD_ADDR      0x0A
 #define MOT_ADDR      0x0A
@@ -11,6 +12,9 @@
 #define MOSI 11
 #define MISO 12
 #define SCK  13
+
+Board *firstBoard;
+Board *lastBoard;
 
 SerialFlashFile file;
 char fileBuffer[4096];
@@ -26,7 +30,7 @@ void setup()
   sercom3.disableWIRE();                         // Disable the I2C bus
   SERCOM3->I2CM.BAUD.bit.BAUD = 43;              // Set the I2C SCL frequency to 400kHz
   sercom3.enableWIRE();                          // Re-enable I2C bus
-  Serial1.begin(9600);
+  Serial1.begin(115200);
 
   SerialFlash.begin(10); // Start the Serialflash library, pin 10 as CS
   pinMode(A0, OUTPUT);
@@ -46,17 +50,22 @@ void setup()
 
   if (!SerialFlash.exists(filename))
   {
-    while(!Serial1.available())
+    SerialFlash.eraseAll();
+    
+    while (!SerialFlash.ready()) 
     {
-      Serial1.println("File does not exist!");
-      blinkError(5);
-      delay(1000);
+      Serial1.println("Formatting flash...");
+      delay(500);
     }
+    Serial1.println("Done formatting flash.");
+    SerialFlash.createErasable(filename, 5000);
     receiveFile();
   }
   else if (digitalRead(A1) == 0)
   {
-    Serial1.println("Wait for formatting to push data file");
+    file = SerialFlash.open(filename);
+    file.erase();
+    file.close();
     receiveFile();
   }
   else

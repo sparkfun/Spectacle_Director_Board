@@ -30,15 +30,6 @@ void receiveFile()
       
       if (state == STATE_START)
       {
-        SerialFlash.eraseAll();
-        
-        while (!SerialFlash.ready()) 
-        {
-          Serial1.println("Formatting flash...");
-          delay(500);
-        }
-        Serial1.println("Done formatting flash.");
-        SerialFlash.createErasable(filename, 5000);
         file = SerialFlash.open(filename);
         if (!file) Serial1.println("Couldn't open file!");
         state = STATE_CONTENT;
@@ -148,6 +139,24 @@ void loadFile()
     {
       Serial1.println("Board type matches!");
     }
+
+    // Add a new Board object to our linked list of extant boards.
+    uint8_t isInput = 0;
+    if (temp >= 128)
+    {
+      isInput = 1;
+    }
+    if (i2c_addr == 0x09) // first time through this loop
+    {
+      firstBoard = new Board(isInput, i2c_addr);
+      lastBoard = firstBoard;
+    }
+    else // subsequent passes through this loop
+    {
+      Board *tempBoard = new Board(isInput, i2c_addr);
+      lastBoard->addBoard(tempBoard);
+      lastBoard = tempBoard;
+    }
     i++; // index past the newline
     i2c_addr++;
     j=0;
@@ -158,7 +167,8 @@ void loadFile()
           //  'N' char of the behavior list.
   i2c_addr = 0x08; // Start one address below the lowest i2c address so we
                    //  can add one at the beginning of the loop.
-                   
+
+  Board* bdPtr = firstBoard;
   // Now, we want to teach the boards about the behaviors we want them
   //  to implement. These are stored in the buffer with break characters
   //  'N' for new board, 'n' for new behavior. Each '\n' separated line
@@ -177,6 +187,9 @@ void loadFile()
                            // change the I2C.
       {
         sendByte(i2c_addr, PROG_ENABLE_REG, 0);
+        // We also need to advance the bdPtr to point to the next Board in
+        //  our linked list.
+        bdPtr = bdPtr->getNextBoard();
       }
       i += 2; // index past 'N' and '\n'.
       i2c_addr++;
@@ -214,7 +227,7 @@ void loadFile()
         buff[j] = '\0'; // NULL terminate the string
         // Convert the data from an ascii string to an integer value.
         long temp = atoi(buff);
-        Serial1.println(temp);
+        //Serial1.println(temp);
         switch (bytes)
         {
           case '1':
@@ -237,13 +250,13 @@ void loadFile()
             fileBuffer[i] == 'n' ||
             fileBuffer[i] == 'Y')
         {
-          Serial1.println(fileBuffer[i]);
+          //Serial1.println(fileBuffer[i]);
           break;
         }
       }
       sendByte(i2c_addr, DATA_READY_REG, 1); // tell daughter board we've got
                                              //  a config set for it.
-      Serial1.println("waiting for daughter board");
+      //Serial1.println("waiting for daughter board");
       while (dataAccepted(i2c_addr) == 1); // Wait for data to be accepted by
                                             //  daughter board.
     }
