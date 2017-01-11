@@ -15,6 +15,7 @@
 
 Board *firstBoard;
 Board *lastBoard;
+int16_t channels[64];
 
 SerialFlashFile file;
 char fileBuffer[4096];
@@ -73,15 +74,57 @@ void setup()
     Serial1.println("File exists!");
     loadFile();
   }
+  Board *bdPtr;
+  bdPtr = firstBoard;
+  for (int z = 0; z < bdPtr->getNumChannels(); ++z)
+  {
+    int tempChl = bdPtr->getChannel(z);
+    Serial1.println(tempChl);
+  }
+  bdPtr = bdPtr->getNextBoard();
+  for (int z = 0; z < bdPtr->getNumChannels(); ++z)
+  {
+    int tempChl = bdPtr->getChannel(z);
+    Serial1.println(tempChl);
+  }
+  Serial1.println("Setup finished!");
 }
 
 void loop() 
 {
-  for (int i = 0; i < 7; i++)
+  Board *bdPtr;
+  bdPtr = firstBoard;
+  while (bdPtr != NULL)
+  {
+    if (bdPtr->isInput() == 1)
+    {
+      for (int i = 0; i < bdPtr->getNumChannels(); ++i)
+      {
+        int tempChl = bdPtr->getChannel(i);
+        channels[tempChl] = getMail(bdPtr->getI2CAddr(), tempChl);
+      }
+    }
+    bdPtr = bdPtr->getNextBoard();
+  }
+  bdPtr = firstBoard;
+  while (bdPtr != NULL)
+  {
+    if (bdPtr->isInput() == 0)
+    {
+      for (int i=0; i<bdPtr->getNumChannels(); ++i)
+      {
+        int tempChl = bdPtr->getChannel(i);
+        sendCmd(bdPtr->getI2CAddr(), tempChl, channels[tempChl]);
+      }
+    }
+    bdPtr = bdPtr->getNextBoard();
+  }
+  /*for (int i = 0; i < 7; i++)
   {
     sendCmd(AUD_ADDR, i, getMail(BTN_ADDR, i));
     delay(10);
-  }
+  }*/
+  delay(25);
 }
 
 

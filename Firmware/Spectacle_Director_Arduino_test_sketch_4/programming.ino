@@ -171,7 +171,7 @@ void loadFile()
                    //  can add one at the beginning of the loop.
 
   Board* bdPtr = firstBoard;
-  uint8_t *channelList;
+  uint8_t *channelList=NULL;
   uint8_t numChannels = 0;
   // Now, we want to teach the boards about the behaviors we want them
   //  to implement. These are stored in the buffer with break characters
@@ -193,17 +193,19 @@ void loadFile()
         sendByte(i2c_addr, PROG_ENABLE_REG, 0);
         // We also need to advance the bdPtr to point to the next Board in
         //  our linked list and add the channelList to the board.
-        Serial1.println("!");
         bdPtr->setChannels(channelList);
-        bdPtr->setNumChannels(numChannels);
-        Serial1.println(bdPtr->getNumChannels());
+        bdPtr->setNumChannels(numChannels);      
+        for (int z = 0; z < bdPtr->getNumChannels(); ++z)
+        {
+          int tempChl = bdPtr->getChannel(z);
+          //Serial1.println(tempChl);
+        }
+        //Serial1.println(bdPtr->getNumChannels());
         numChannels = 0;
         bdPtr = bdPtr->getNextBoard();
       }
       i += 2; // index past 'N' and '\n'.
       i2c_addr++;
-      Serial1.println(bdPtr->getI2CAddr());
-      if (bdPtr->getNextBoard() == NULL) Serial1.println("NULL");
       // Tell the daughter board that programming data is incoming.
       sendByte(i2c_addr, PROG_ENABLE_REG, 1);
       while(progReady(i2c_addr) == 0); // wait for the daughter board to
@@ -215,7 +217,12 @@ void loadFile()
     {
       bdPtr->setChannels(channelList);
       bdPtr->setNumChannels(numChannels);
-      Serial1.println(bdPtr->getNumChannels());
+      for (int z = 0; z < bdPtr->getNumChannels(); ++z)
+      {
+        int tempChl = bdPtr->getChannel(z);
+        //Serial1.println(tempChl);
+      }
+      //Serial1.println(bdPtr->getNumChannels());
       sendByte(i2c_addr, PROG_ENABLE_REG, 0);
       break;
     }
@@ -250,10 +257,9 @@ void loadFile()
           {
             channelListTemp[k] = channelList[k];
           }
-          channelListTemp[numChannels] = temp;
+          channelListTemp[numChannels-1] = temp;
           channelList = channelListTemp;
         }
-        //Serial1.println(temp);
         switch (bytes)
         {
           case '1':
@@ -297,7 +303,7 @@ void loadFile()
   {
     for (int x = 0; x < bdPtr->getNumChannels(); ++x)
     {
-      //Serial1.println(bdPtr->getChannel(x));
+      Serial1.println(bdPtr->getChannel(x));
     }
     bdPtr = bdPtr->getNextBoard();
   }
