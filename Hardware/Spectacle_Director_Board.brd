@@ -28,7 +28,7 @@
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
 <layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
-<layer number="39" name="tKeepout" color="16" fill="11" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="16" fill="11" visible="yes" active="yes"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="yes"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="yes"/>
 <layer number="42" name="bRestrict" color="1" fill="10" visible="no" active="yes"/>
@@ -3881,11 +3881,11 @@ These rules have been curated by SparkFuns DFM commitee. After doing much resear
 <contactref element="C15" pad="2"/>
 <contactref element="Y1" pad="P$2"/>
 <contactref element="U2" pad="1"/>
-<wire x1="10.9855" y1="30.2895" x2="5.7277" y2="30.2895" width="0.2032" layer="1"/>
-<wire x1="5.1" y1="29.6364" x2="5.1" y2="29.083" width="0.2032" layer="1"/>
+<wire x1="10.9855" y1="30.2895" x2="5.8547" y2="30.2895" width="0.2032" layer="1"/>
+<wire x1="5.1" y1="29.6364" x2="5.1" y2="29.5348" width="0.2032" layer="1"/>
 <wire x1="3.39" y1="29.083" x2="5.1" y2="29.083" width="0.2032" layer="1"/>
-<wire x1="5.7277" y1="30.2895" x2="5.1" y2="29.6618" width="0.2032" layer="1"/>
-<wire x1="5.1" y1="29.6618" x2="5.1" y2="29.083" width="0.2032" layer="1"/>
+<wire x1="5.8547" y1="30.2895" x2="5.1" y2="29.5348" width="0.2032" layer="1"/>
+<wire x1="5.1" y1="29.5348" x2="5.1" y2="29.083" width="0.2032" layer="1"/>
 <wire x1="10.9855" y1="30.2895" x2="11.22" y2="30.524" width="0.2032" layer="1"/>
 <wire x1="11.22" y1="30.524" x2="11.22" y2="31.31" width="0.2032" layer="1"/>
 </signal>
