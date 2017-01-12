@@ -16,9 +16,9 @@ void receiveFile()
   uint32_t lastReceiveTime = millis();
 
   //We assume the serial receive part is finished when we have not received something for 30 seconds
-  while(Serial1.available() || lastReceiveTime + 30000 > millis())
+  while(SerialUSB.available() || lastReceiveTime + 30000 > millis())
   {
-    uint16_t available = Serial1.readBytes(usbBuffer, USB_BUFFER_SIZE);
+    uint16_t available = SerialUSB.readBytes(usbBuffer, USB_BUFFER_SIZE);
     if (available)
     {
       lastReceiveTime = millis();
@@ -31,14 +31,14 @@ void receiveFile()
       if (state == STATE_START)
       {
         file = SerialFlash.open(filename);
-        if (!file) Serial1.println("Couldn't open file!");
+        if (!file) SerialUSB.println("Couldn't open file!");
         state = STATE_CONTENT;
       }
       else if (state == STATE_CONTENT)
       {
         if (b == BYTE_SEPARATOR)
         {
-          Serial1.println("End of file");
+          SerialUSB.println("End of file");
           file.write(flashBuffer, flashBufferIndex);
           file.close();
           flashBufferIndex = 0;
@@ -49,7 +49,7 @@ void receiveFile()
         else 
         {
           flashBuffer[flashBufferIndex++] = b;
-          Serial1.print((char)b);
+          SerialUSB.print((char)b);
         }
         if (flashBufferIndex >= FLASH_BUFFER_SIZE)
         {
@@ -69,10 +69,10 @@ void loadFile()
   file = SerialFlash.open(filename);
   // catch a file error, although it's very unlikely one could happen
   //  at this point in the code b/c of the way the earlier code works
-  if (file) Serial1.println("File opened");
+  if (file) SerialUSB.println("File opened");
   else 
   {
-    Serial1.println("File didn't open");
+    SerialUSB.println("File didn't open");
     while(1)
     {
       blinkError(6);
@@ -106,7 +106,7 @@ void loadFile()
   }
   else
   {
-    Serial1.println("Good config data!");
+    SerialUSB.println("Good config data!");
   }
 
   // j will be used for a local index in buff to copy data out of
@@ -133,11 +133,11 @@ void loadFile()
     configureBoard(i2c_addr);
     if (temp != checkType(i2c_addr))
     {
-      Serial1.println("Board type does not match!");
+      SerialUSB.println("Board type does not match!");
     }
     else
     {
-      Serial1.println("Board type matches!");
+      SerialUSB.println("Board type matches!");
     }
 
     // Add a new Board object to our linked list of extant boards.
@@ -195,12 +195,12 @@ void loadFile()
         //  our linked list and add the channelList to the board.
         bdPtr->setChannels(channelList);
         bdPtr->setNumChannels(numChannels);      
-        for (int z = 0; z < bdPtr->getNumChannels(); ++z)
+       /* for (int z = 0; z < bdPtr->getNumChannels(); ++z)
         {
           int tempChl = bdPtr->getChannel(z);
-          //Serial1.println(tempChl);
-        }
-        //Serial1.println(bdPtr->getNumChannels());
+          //SerialUSB.println(tempChl);
+        }*/
+        //SerialUSB.println(bdPtr->getNumChannels());
         numChannels = 0;
         bdPtr = bdPtr->getNextBoard();
       }
@@ -217,12 +217,12 @@ void loadFile()
     {
       bdPtr->setChannels(channelList);
       bdPtr->setNumChannels(numChannels);
-      for (int z = 0; z < bdPtr->getNumChannels(); ++z)
+      /*for (int z = 0; z < bdPtr->getNumChannels(); ++z)
       {
         int tempChl = bdPtr->getChannel(z);
-        //Serial1.println(tempChl);
-      }
-      //Serial1.println(bdPtr->getNumChannels());
+        //SerialUSB.println(tempChl);
+      }*/
+      //SerialUSB.println(bdPtr->getNumChannels());
       sendByte(i2c_addr, PROG_ENABLE_REG, 0);
       break;
     }
@@ -282,13 +282,13 @@ void loadFile()
             fileBuffer[i] == 'n' ||
             fileBuffer[i] == 'Y')
         {
-          //Serial1.println(fileBuffer[i]);
+          //SerialUSB.println(fileBuffer[i]);
           break;
         }
       }
       sendByte(i2c_addr, DATA_READY_REG, 1); // tell daughter board we've got
                                              //  a config set for it.
-      //Serial1.println("waiting for daughter board");
+      //SerialUSB.println("waiting for daughter board");
       while (dataAccepted(i2c_addr) == 1); // Wait for data to be accepted by
                                             //  daughter board.
     }
@@ -298,15 +298,15 @@ void loadFile()
       dataIntegrityError();
     }
   }
-  bdPtr = firstBoard;
+ /* bdPtr = firstBoard;
   while (bdPtr != NULL)
   {
     for (int x = 0; x < bdPtr->getNumChannels(); ++x)
     {
-      Serial1.println(bdPtr->getChannel(x));
+      SerialUSB.println(bdPtr->getChannel(x));
     }
     bdPtr = bdPtr->getNextBoard();
-  }
+  }*/
 }
 
 void dataIntegrityError()
@@ -318,7 +318,7 @@ void dataIntegrityError()
   // ...and then go into an infinite error code blink loop.
   while(1)
   {
-  Serial1.println("Bad config data!");
+  SerialUSB.println("Bad config data!");
   delay(1000);
   blinkError(4);
   }

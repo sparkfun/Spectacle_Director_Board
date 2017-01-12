@@ -1,3 +1,5 @@
+// Working with 1.6.9, Arduino SAMD v 1.6.9, SparkFun SAMD v 1.3.2
+
 #include <Wire.h>
 #include "dbt.h"
 #include <SerialFlash.h>
@@ -13,6 +15,20 @@
 #define MISO 12
 #define SCK  13
 
+#define VOUT_EN A3
+
+// Defines for prototype boards
+#define MEM_CS  9
+#define MEM_RST 4
+#define SIG_LED 7
+#define LOAD_BTN 6
+/*
+// Defines for protoboard
+#define MEM_CS  10
+#define MEM_RST A0
+#define SIG_LED 7
+#define LOAD_BTN A1
+*/
 Board *firstBoard;
 Board *lastBoard;
 int16_t channels[64];
@@ -23,30 +39,34 @@ char filename[11] = "config.txt";
 
 void setup() 
 {
-  pinMode(7, OUTPUT);  // Signal LED
-  pinMode(A1, INPUT_PULLUP);
-  digitalWrite(7, LOW);
-  pinMode(10, OUTPUT);
+  pinMode(SIG_LED, OUTPUT);  // Signal LED
+  pinMode(VOUT_EN, OUTPUT);
+  digitalWrite(VOUT_EN, HIGH);
+  delay(1000);
+  pinMode(LOAD_BTN, INPUT_PULLUP);
+  digitalWrite(SIG_LED, LOW);
+  pinMode(MEM_CS, OUTPUT);
   Wire.begin();
   sercom3.disableWIRE();                         // Disable the I2C bus
   SERCOM3->I2CM.BAUD.bit.BAUD = 43;              // Set the I2C SCL frequency to 400kHz
   sercom3.enableWIRE();                          // Re-enable I2C bus
-  Serial1.begin(115200);
+  SerialUSB.begin(115200);
+  SerialUSB.println("Online!");
 
-  SerialFlash.begin(10); // Start the Serialflash library, pin 10 as CS
-  pinMode(A0, OUTPUT);
-  digitalWrite(A0, LOW);      // Reset the flash memory controller
+  SerialFlash.begin(MEM_CS); // Start the Serialflash library, pin 10 as CS
+  pinMode(MEM_RST, OUTPUT);
+  digitalWrite(MEM_RST, LOW);      // Reset the flash memory controller
   delay(10);
-  digitalWrite(A0, HIGH);
+  digitalWrite(MEM_RST, HIGH);
   delay(10);
   
   uint8_t id[5];
   SerialFlash.readID(id);
-  Serial1.print(id[0], HEX);
-  Serial1.print(id[1], HEX);
-  Serial1.print(id[2], HEX);
-  Serial1.print(id[3], HEX);
-  Serial1.println(id[4], HEX);
+  SerialUSB.print(id[0], HEX);
+  SerialUSB.print(id[1], HEX);
+  SerialUSB.print(id[2], HEX);
+  SerialUSB.print(id[3], HEX);
+  SerialUSB.println(id[4], HEX);
 
 
   if (!SerialFlash.exists(filename))
@@ -55,14 +75,14 @@ void setup()
     
     while (!SerialFlash.ready()) 
     {
-      Serial1.println("Formatting flash...");
+      SerialUSB.println("Formatting flash...");
       delay(500);
     }
-    Serial1.println("Done formatting flash.");
+    SerialUSB.println("Done formatting flash.");
     SerialFlash.createErasable(filename, 5000);
     receiveFile();
   }
-  else if (digitalRead(A1) == 0)
+  else if (digitalRead(LOAD_BTN) == 0)
   {
     file = SerialFlash.open(filename);
     file.erase();
@@ -71,23 +91,11 @@ void setup()
   }
   else
   {
-    Serial1.println("File exists!");
+    SerialUSB.println("File exists!");
     loadFile();
   }
-  Board *bdPtr;
-  bdPtr = firstBoard;
-  for (int z = 0; z < bdPtr->getNumChannels(); ++z)
-  {
-    int tempChl = bdPtr->getChannel(z);
-    Serial1.println(tempChl);
-  }
-  bdPtr = bdPtr->getNextBoard();
-  for (int z = 0; z < bdPtr->getNumChannels(); ++z)
-  {
-    int tempChl = bdPtr->getChannel(z);
-    Serial1.println(tempChl);
-  }
-  Serial1.println("Setup finished!");
+
+  SerialUSB.println("Setup finished!");
 }
 
 void loop() 
@@ -119,11 +127,6 @@ void loop()
     }
     bdPtr = bdPtr->getNextBoard();
   }
-  /*for (int i = 0; i < 7; i++)
-  {
-    sendCmd(AUD_ADDR, i, getMail(BTN_ADDR, i));
-    delay(10);
-  }*/
   delay(25);
 }
 
