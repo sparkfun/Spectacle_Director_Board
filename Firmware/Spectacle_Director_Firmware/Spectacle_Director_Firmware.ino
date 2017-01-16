@@ -1,3 +1,31 @@
+/****************************************************************************
+ * Spectacle_Director_Firmware.ino
+ * Spectacle Director Firmware Main
+ * Mike Hord @ SparkFun Electronics
+ * 16 Jan 2017
+ * https://github.com/sparkfun/Spectacle_Director_Board
+ * 
+ * This file contains the setup() and loop() functions of the Spectacle Director
+ * board's firmware. setup() initializes hardware, checks and downloads (if need
+ * be) new configuration data, and configures the connected daughter boards.
+ * loop() transfers data from source (input) daughter boards to sink (output)
+ * daughter boards, while also implementing any virtual board functionality that
+ * is needed.
+ * 
+ * Resources:
+ * SerialFlash by Paul Stoffregen - https://github.com/PaulStoffregen/SerialFlash/
+ * 
+ * Development environment specifics:
+ * Arduino 1.8.1
+ * Arduino SAMD core 1.6.11
+ * SparkFun SAMD core 1.3.3
+ * Director Board v10
+ * 
+ * This code is beerware; if you see me (or any other SparkFun employee) at the
+ * local, and you've found our code helpful, please buy us a round!
+ * ****************************************************************************/
+ */
+
 #include <Wire.h>
 #include "i2c_registers.h"
 #include <SerialFlash.h>
