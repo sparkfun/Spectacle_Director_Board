@@ -2,15 +2,15 @@ boolean configureBoard(byte address)
 {
   while (isReady(0x08) == false)
   {
-    SerialUSB.println("0x08 not found");
+    Serial1.println("0x08 not found");
   }
   sendByte(0x08, I2C_ADDR_REG, address);
   sendByte(0x08, CONFIGURED_REG, 1);
   while (isReady(address) == false)
   {
-    SerialUSB.println("new address not found");
+    Serial1.println("new address not found");
   }
-  SerialUSB.println("new address found!");
+  Serial1.println("new address found!");
 }
 
 void servoInit(uint8_t address, uint8_t channel, int16_t threshold, uint8_t servoID, 

@@ -1,5 +1,3 @@
-// Working with 1.6.9, Arduino SAMD v 1.6.9, SparkFun SAMD v 1.3.2
-
 #include <Wire.h>
 #include "dbt.h"
 #include <SerialFlash.h>
@@ -16,19 +14,19 @@
 #define SCK  13
 
 #define VOUT_EN A3
-
+/*
 // Defines for prototype boards
 #define MEM_CS  9
 #define MEM_RST 4
 #define SIG_LED 7
 #define LOAD_BTN 6
-/*
+*/
 // Defines for protoboard
 #define MEM_CS  10
 #define MEM_RST A0
 #define SIG_LED 7
 #define LOAD_BTN A1
-*/
+
 Board *firstBoard;
 Board *lastBoard;
 int16_t channels[64];
@@ -50,8 +48,8 @@ void setup()
   sercom3.disableWIRE();                         // Disable the I2C bus
   SERCOM3->I2CM.BAUD.bit.BAUD = 43;              // Set the I2C SCL frequency to 400kHz
   sercom3.enableWIRE();                          // Re-enable I2C bus
-  SerialUSB.begin(115200);
-  SerialUSB.println("Online!");
+  Serial1.begin(115200);
+  Serial1.println("Online!");
 
   SerialFlash.begin(MEM_CS); // Start the Serialflash library, pin 10 as CS
   pinMode(MEM_RST, OUTPUT);
@@ -62,28 +60,31 @@ void setup()
   
   uint8_t id[5];
   SerialFlash.readID(id);
-  SerialUSB.print(id[0], HEX);
-  SerialUSB.print(id[1], HEX);
-  SerialUSB.print(id[2], HEX);
-  SerialUSB.print(id[3], HEX);
-  SerialUSB.println(id[4], HEX);
+  Serial1.print(id[0], HEX);
+  Serial1.print(id[1], HEX);
+  Serial1.print(id[2], HEX);
+  Serial1.print(id[3], HEX);
+  Serial1.println(id[4], HEX);
 
 
+  Serial1.println("Setup complete!");
+  
   if (!SerialFlash.exists(filename))
   {
     SerialFlash.eraseAll();
     
     while (!SerialFlash.ready()) 
     {
-      SerialUSB.println("Formatting flash...");
-      delay(500);
+      Serial1.println("Formatting flash...");
+      blinkLED(250);
     }
-    SerialUSB.println("Done formatting flash.");
-    SerialFlash.createErasable(filename, 5000);
+    Serial1.println("Done formatting flash.");
+    SerialFlash.createErasable(filename, 4096);
     receiveFile();
   }
   else if (digitalRead(LOAD_BTN) == 0)
   {
+    Serial1.println("Load file mode");
     file = SerialFlash.open(filename);
     file.erase();
     file.close();
@@ -91,11 +92,11 @@ void setup()
   }
   else
   {
-    SerialUSB.println("File exists!");
+    Serial1.println("File exists!");
     loadFile();
   }
 
-  SerialUSB.println("Setup finished!");
+  Serial1.println("Setup finished!");
 }
 
 void loop() 

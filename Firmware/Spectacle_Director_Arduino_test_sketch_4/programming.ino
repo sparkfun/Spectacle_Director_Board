@@ -1,8 +1,47 @@
 #include "programming.h"
 
+// Sync AC
+static __inline__ void ACsync() __attribute__((always_inline, unused));
+static void   ACsync() {
+  while (AC->STATUSB.bit.SYNCBUSY == 1);
+}
+// Sync GCLK
+static __inline__ void syncGCLK() __attribute__((always_inline, unused));
+static void syncGCLK() {
+  while (GCLK->STATUS.bit.SYNCBUSY == 1);
+}
+
+// variable definitions
+uint8_t AC0level  = 32;   // AC0 level
+uint8_t AC1level  = 32;   // AC1 level
+volatile uint8_t ACintflag = 0 ;  // Used to identify AC interupt source
+long lastInt = 0;
+long lastBit = 0;
+long tsli = 0;
+long tslb = 0;
+
+#define CARRIER_FREQ    4000
+#define MOD_FREQ        1000
+#define BAUD            300
+#define CARRIER_LEN     (1000000/CARRIER_FREQ) 
+#define CARRIER_LEN_LO  (0.9*CARRIER_LEN)
+#define CARRIER_LEN_HI  (1.1*CARRIER_LEN)
+#define ZERO_FREQ       (CARRIER_FREQ - MOD_FREQ)
+#define ONE_FREQ        (CARRIER_FREQ + MOD_FREQ)
+#define ZERO_BIT_LEN    (1000000/ZERO_FREQ)
+#define ZERO_BIT_LEN_LO (0.8*ZERO_BIT_LEN)
+#define ZERO_BIT_LEN_HI (1.2*ZERO_BIT_LEN)
+#define ONE_BIT_LEN     (1000000/ONE_FREQ)
+#define ONE_BIT_LEN_LO  (0.8*ONE_BIT_LEN)
+#define ONE_BIT_LEN_HI  (1.20*ONE_BIT_LEN)
+#define BIT_LEN         (1000000/BAUD)
+
 void receiveFile()
 {
-    
+  setupAC(AC0level, AC1level);
+  Serial1.println("Receive file");
+  tsli = micros();
+  
   uint8_t state = STATE_START;
   uint8_t fileSizeIndex = 0;
   uint32_t fileSize = 0;
@@ -16,29 +55,84 @@ void receiveFile()
   uint32_t lastReceiveTime = millis();
 
   //We assume the serial receive part is finished when we have not received something for 30 seconds
-  while(SerialUSB.available() || lastReceiveTime + 30000 > millis())
+  while((lastReceiveTime + 30000) > millis())
   {
-    uint16_t available = SerialUSB.readBytes(usbBuffer, USB_BUFFER_SIZE);
+    uint16_t available; // = Serial1.readBytes(usbBuffer, USB_BUFFER_SIZE);
+    static bool notReceiving = true;
+    bool newBit = false;
+    static byte bitsReceived = 0;
+    static unsigned int incByte = 0;
+    static bool endBitSeen = false;
+    char receivedByte = 0;
+    //Serial1.println("WFD");
+  
+    if(ACintflag != 0) 
+    {
+      // Interrupt triggered - so do soemthng (maybe) 
+      tsli = micros() - lastInt;
+      lastInt = micros();
+      ACintflag = 0;
+      //Serial1.println("ACINT");
+
+      if (notReceiving) // Watch for a start bit when not receiving.
+      {
+        if ((tsli > ZERO_BIT_LEN_LO) && (tsli < ZERO_BIT_LEN_HI))
+        {
+          notReceiving = false;
+          lastBit=lastInt;
+          incByte = 0;
+          bitsReceived = 0;
+        }
+      }
+
+      // Recognize a one or zero when received.
+      else if (micros() - lastBit > (BIT_LEN))
+      {
+        if ((tsli > ZERO_BIT_LEN_LO) && (tsli < ZERO_BIT_LEN_HI))
+        {
+          //Serial1.println("0");
+          bitsReceived++;
+          incByte = incByte<<1;
+          lastBit = lastInt;
+        }
+        else if ((tsli > ONE_BIT_LEN_LO) && (tsli < ONE_BIT_LEN_HI))
+        {
+          //Serial1.println("1");
+          bitsReceived++;
+          incByte = incByte<<1 | 1;
+          lastBit = lastInt;
+        }
+      }
+
+      // Recognize that a full byte has been received.
+      if (bitsReceived == 10)
+      {
+        bitsReceived = 0;
+        receivedByte = incByte>>2;
+        //Serial1.print((char)receivedByte);
+        available = 1;
+        incByte = 0;
+        notReceiving = true;
+      }
+    }    
+    if (state == STATE_DONE) break;
+    
     if (available)
     {
+      available = 0;
       lastReceiveTime = millis();
-    }
-    if (state == STATE_DONE) break;
-    for (uint16_t usbBufferIndex = 0; usbBufferIndex < available; usbBufferIndex++)
-    {
-      uint8_t b = usbBuffer[usbBufferIndex];
+      uint8_t b = receivedByte;
       
       if (state == STATE_START)
       {
         file = SerialFlash.open(filename);
-        if (!file) SerialUSB.println("Couldn't open file!");
         state = STATE_CONTENT;
       }
       else if (state == STATE_CONTENT)
       {
         if (b == BYTE_SEPARATOR)
         {
-          SerialUSB.println("End of file");
+          Serial1.println("End of file");
           file.write(flashBuffer, flashBufferIndex);
           file.close();
           flashBufferIndex = 0;
@@ -49,7 +143,6 @@ void receiveFile()
         else 
         {
           flashBuffer[flashBufferIndex++] = b;
-          SerialUSB.print((char)b);
         }
         if (flashBufferIndex >= FLASH_BUFFER_SIZE)
         {
@@ -59,6 +152,7 @@ void receiveFile()
       }
     }
   }
+  Serial1.println("Out of while");
 }
 
 // Load file from flash into memory, then program the downstream boards with
@@ -69,10 +163,10 @@ void loadFile()
   file = SerialFlash.open(filename);
   // catch a file error, although it's very unlikely one could happen
   //  at this point in the code b/c of the way the earlier code works
-  if (file) SerialUSB.println("File opened");
+  if (file) Serial1.println("File opened");
   else 
   {
-    SerialUSB.println("File didn't open");
+    Serial1.println("File didn't open");
     while(1)
     {
       blinkError(6);
@@ -106,7 +200,7 @@ void loadFile()
   }
   else
   {
-    SerialUSB.println("Good config data!");
+    Serial1.println("Good config data!");
   }
 
   // j will be used for a local index in buff to copy data out of
@@ -133,11 +227,11 @@ void loadFile()
     configureBoard(i2c_addr);
     if (temp != checkType(i2c_addr))
     {
-      SerialUSB.println("Board type does not match!");
+      Serial1.println("Board type does not match!");
     }
     else
     {
-      SerialUSB.println("Board type matches!");
+      Serial1.println("Board type matches!");
     }
 
     // Add a new Board object to our linked list of extant boards.
@@ -198,9 +292,9 @@ void loadFile()
        /* for (int z = 0; z < bdPtr->getNumChannels(); ++z)
         {
           int tempChl = bdPtr->getChannel(z);
-          //SerialUSB.println(tempChl);
+          //Serial1.println(tempChl);
         }*/
-        //SerialUSB.println(bdPtr->getNumChannels());
+        //Serial1.println(bdPtr->getNumChannels());
         numChannels = 0;
         bdPtr = bdPtr->getNextBoard();
       }
@@ -220,9 +314,9 @@ void loadFile()
       /*for (int z = 0; z < bdPtr->getNumChannels(); ++z)
       {
         int tempChl = bdPtr->getChannel(z);
-        //SerialUSB.println(tempChl);
+        //Serial1.println(tempChl);
       }*/
-      //SerialUSB.println(bdPtr->getNumChannels());
+      //Serial1.println(bdPtr->getNumChannels());
       sendByte(i2c_addr, PROG_ENABLE_REG, 0);
       break;
     }
@@ -282,13 +376,13 @@ void loadFile()
             fileBuffer[i] == 'n' ||
             fileBuffer[i] == 'Y')
         {
-          //SerialUSB.println(fileBuffer[i]);
+          //Serial1.println(fileBuffer[i]);
           break;
         }
       }
       sendByte(i2c_addr, DATA_READY_REG, 1); // tell daughter board we've got
                                              //  a config set for it.
-      //SerialUSB.println("waiting for daughter board");
+      //Serial1.println("waiting for daughter board");
       while (dataAccepted(i2c_addr) == 1); // Wait for data to be accepted by
                                             //  daughter board.
     }
@@ -303,7 +397,7 @@ void loadFile()
   {
     for (int x = 0; x < bdPtr->getNumChannels(); ++x)
     {
-      SerialUSB.println(bdPtr->getChannel(x));
+      Serial1.println(bdPtr->getChannel(x));
     }
     bdPtr = bdPtr->getNextBoard();
   }*/
@@ -318,9 +412,64 @@ void dataIntegrityError()
   // ...and then go into an infinite error code blink loop.
   while(1)
   {
-  SerialUSB.println("Bad config data!");
+  Serial1.println("Bad config data!");
   delay(1000);
   blinkError(4);
   }
 }
 
+//##############################################################
+//  This is the interrupt handler. The name is fixed, but you can
+//  do what you like in here
+//##############################################################
+
+void AC_Handler()
+{
+  ACintflag = 0;  // Clear any previous interupt
+  ACintflag = REG_AC_INTFLAG; // Copy the interupt flag register
+  REG_AC_INTFLAG = 0x03;  // Reset the interrupts by writing  1s
+}
+
+//  Setup the Analogue Comparator with threshold values
+//  AC0level and AC1level in 64 steps to VDD = +3.3 V
+void setupAC(uint8_t AC0level, uint8_t AC1level )
+{
+   // Set up the AC clocks
+  syncGCLK();
+  GCLK->CLKCTRL.reg = 0x4120; //enable GGCLK for AC_ana, CLKGEN1 = 32 kHz Xtal
+  syncGCLK();
+  REG_GCLK_CLKCTRL = 0x401F; //enable GGCLK for AC_dig, CLKGEN0 = 48 MHz PLL
+  syncGCLK();
+  // Set up the AC
+  REG_PM_APBCMASK |= PM_APBCMASK_AC;        // Set the AC bit in the APBCMASK register
+  REG_AC_CTRLA = 0x00;      // Disable comparator(s)
+  ACsync();
+  REG_AC_COMPCTRL0 = 0x00083524;  // MUXPOS = AIN3 pin int on rising
+  ACsync();
+  REG_AC_COMPCTRL1 = 0x00082524;  // MUXPOS = AIN2  pin, int on rising
+  ACsync();
+  REG_AC_INTENSET = 0x03;   // Both AC generate an interrupt
+  REG_AC_WINCTRL = 0x00;    // Single comparator modes
+  ACsync();
+  REG_AC_SCALER0 = AC0level;    // Set threshold level
+  REG_AC_SCALER1 = AC1level;    // Set threshold level
+  // Enable InterruptVector
+  NVIC_EnableIRQ(AC_IRQn);  // Enable intrupt vector
+  ACsync();
+  REG_AC_COMPCTRL0 |= 0x00001;
+   ACsync();
+  REG_AC_COMPCTRL1 |= 0x00001;
+   ACsync();
+  REG_AC_CTRLA = 0x02;      // Enable comparator(s)
+  ACsync();
+  REG_AC_INTFLAG = 0x03;  // Reset the interupts by writing  1s
+}
+
+// Read the Analogue Comparator values that exceed the threshold values
+//0 = none, 1 = AC0, 2 = AC1, 3 = AC0 and AC1
+uint8_t readAC()
+{
+  ACsync();
+  uint8_t statusa = REG_AC_STATUSA & 0x03 ; 
+  return statusa ;
+}
