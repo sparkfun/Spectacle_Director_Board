@@ -12,7 +12,7 @@ boolean configureBoard(byte address)
   }
   Serial1.println("new address found!");
 }
-
+/*
 void servoInit(uint8_t address, uint8_t channel, int16_t threshold, uint8_t servoID, 
                uint8_t mode, uint16_t posA, uint16_t posB, 
                uint32_t dwellA, uint32_t dwellB)
@@ -102,4 +102,4 @@ void ledInit(byte address, uint8_t channel, int16_t threshold, uint8_t mode,
   sendByte(address, DATA_READY_REG, 1);
   while (dataAccepted(address) == 1) Serial.println("LED");
 }
-
+*/

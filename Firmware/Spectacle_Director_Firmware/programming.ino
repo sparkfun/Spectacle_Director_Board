@@ -1,5 +1,7 @@
 #include "programming.h"
 
+// Certain registers in the SAMD21 need synchronization before being
+//  written. These two functions handle that.
 // Sync AC
 static __inline__ void ACsync() __attribute__((always_inline, unused));
 static void   ACsync() {
@@ -46,7 +48,7 @@ void receiveFile()
   uint8_t fileSizeIndex = 0;
   uint32_t fileSize = 0;
   
-  char usbBuffer[USB_BUFFER_SIZE];
+//  char usbBuffer[USB_BUFFER_SIZE];
   uint8_t flashBuffer[FLASH_BUFFER_SIZE];
   
   uint16_t flashBufferIndex = 0;
