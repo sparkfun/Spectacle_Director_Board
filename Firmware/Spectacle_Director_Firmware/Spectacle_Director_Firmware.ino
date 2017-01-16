@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include "dbt.h"
+#include "i2c_registers.h"
 #include <SerialFlash.h>
 #include <SPI.h>
 #include "boards.h"

@@ -1,3 +1,6 @@
+#ifndef _programming_h_
+#define _programming_h_
+
 //State machine
 #define STATE_START      0
 #define STATE_DONE       1
@@ -9,6 +12,7 @@
 #define BYTE_SEPARATOR    0x58
 
 //Buffer sizes
-//#define USB_BUFFER_SIZE      32
 #define FLASH_BUFFER_SIZE    4096
+
+#endif
 

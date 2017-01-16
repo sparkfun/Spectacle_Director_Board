@@ -1,3 +1,5 @@
+#ifndef _boards_h_
+#define _boards_h_
 class Board
 {
   public:
@@ -17,4 +19,4 @@ class Board
   uint8_t numChannels;
   uint8_t *channels;
 };
-
+#endif
