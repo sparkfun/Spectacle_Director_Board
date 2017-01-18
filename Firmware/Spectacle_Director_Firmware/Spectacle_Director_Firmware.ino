@@ -24,7 +24,6 @@
  * This code is beerware; if you see me (or any other SparkFun employee) at the
  * local, and you've found our code helpful, please buy us a round!
  * ****************************************************************************/
- */
 
 #include <Wire.h>
 #include "i2c_registers.h"

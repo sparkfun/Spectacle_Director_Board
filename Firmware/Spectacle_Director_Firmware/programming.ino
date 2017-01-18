@@ -14,8 +14,8 @@ static void syncGCLK() {
 }
 
 // variable definitions
-uint8_t AC0level  = 32;   // AC0 level
-uint8_t AC1level  = 32;   // AC1 level
+uint8_t AC0level  = 16;   // AC0 level
+uint8_t AC1level  = 16;   // AC1 level
 volatile uint8_t ACintflag = 0 ;  // Used to identify AC interupt source
 long lastInt = 0;
 long lastBit = 0;
@@ -64,6 +64,7 @@ void receiveFile()
     bool newBit = false;
     static byte bitsReceived = 0;
     static unsigned int incByte = 0;
+    static uint16_t lineStart = 0;
     static bool endBitSeen = false;
     char receivedByte = 0;
     //Serial1.println("WFD");
@@ -117,10 +118,12 @@ void receiveFile()
         notReceiving = true;
       }
     }    
+    
     if (state == STATE_DONE) break;
     
     if (available)
     {
+      //Serial1.println("DATA");
       available = 0;
       lastReceiveTime = millis();
       uint8_t b = receivedByte;
@@ -130,9 +133,10 @@ void receiveFile()
         file = SerialFlash.open(filename);
         state = STATE_CONTENT;
       }
-      else if (state == STATE_CONTENT)
+      if (state == STATE_CONTENT)
       {
-        if (b == BYTE_SEPARATOR)
+        Serial1.print((char)b);
+        if ((b == '\n') && (flashBuffer[flashBufferIndex - 1] == BYTE_SEPARATOR))
         {
           Serial1.println("End of file");
           file.write(flashBuffer, flashBufferIndex);
@@ -144,7 +148,33 @@ void receiveFile()
         //Normal byte; add to buffer
         else 
         {
-          flashBuffer[flashBufferIndex++] = b;
+          // Checksum calculation. If the character before this one was a
+          //  newline, this character is a checksum, and we need to check
+          //  the last line received.
+          if ((flashBuffer[flashBufferIndex-1] == '\n') &&
+              (flashBufferIndex > lineStart))
+          {
+            uint8_t checksum = 0;
+            for (int i = lineStart; i < flashBufferIndex; ++i)
+            {
+              checksum = checksum + flashBuffer[i];
+            }
+            Serial1.println(b);
+            Serial1.println(checksum);
+            if (checksum != b)
+            {
+              while(1)
+              {
+                delay(1000);
+                blinkError(8);
+              }
+            }
+            lineStart = flashBufferIndex;
+          }
+          else // NOT a checksum character, so stash it
+          {
+            flashBuffer[flashBufferIndex++] = b;
+          }
         }
         if (flashBufferIndex >= FLASH_BUFFER_SIZE)
         {
