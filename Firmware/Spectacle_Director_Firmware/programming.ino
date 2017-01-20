@@ -514,6 +514,23 @@ void loadFile()
           }
           buff[j] = '\0'; // NULL terminate the string
           vBrdPtr->setPeriod(atol(buff));
+          vBrdPtr->setLastPeriod(0);
+          i++; // index past newline
+        break;
+        case RANDOM_TRIGGER:
+        
+          j = 0;     // reset the short buffer's index
+          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
+                                        // VBoard config, the mode.
+          {
+            buff[j] = fileBuffer[i];
+            j++;
+            i++;
+          }
+          buff[j] = '\0'; // NULL terminate the string
+          vBrdPtr->setPeriod(atol(buff));
+          vBrdPtr->setPersist(100);
+          vBrdPtr->setLastPeriod(0);
           i++; // index past newline
         break;
         case PERIODIC: // for periodic mode, we fetch two uint32_t values, period and persist
@@ -527,6 +544,7 @@ void loadFile()
           }
           buff[j] = '\0'; // NULL terminate the string
           vBrdPtr->setPeriod(atol(buff));
+          vBrdPtr->setLastPeriod(0);
           i++; // index past newline
           j = 0;     // reset the short buffer's index
           while (fileBuffer[i] != '\n') // Now we're reading the second line of the

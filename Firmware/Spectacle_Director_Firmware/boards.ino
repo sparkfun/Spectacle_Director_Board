@@ -89,6 +89,26 @@ uint32_t VBoard::getPersist()
   return this->persist;
 }
 
+void VBoard::setLastPeriod(uint32_t period)
+{
+  this->lastPeriod = period;
+}
+
+uint32_t VBoard::getLastPeriod()
+{
+  return this->lastPeriod;
+}
+
+void VBoard::setLastPersist(uint32_t persist)
+{
+  this->lastPersist = persist;
+}
+
+uint32_t VBoard::getLastPersist()
+{
+  return this->lastPersist;
+}
+
 void VBoard::setValue(uint16_t value)
 {
   this->value = value;

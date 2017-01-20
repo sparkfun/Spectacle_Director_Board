@@ -164,6 +164,38 @@ void loop()
       case XOR:
         vbXor(vBdPtr->getChannel(0), vBdPtr->getChannel(1), vBdPtr->getChannel(2));
       break;
+      case RANDOM:
+      if (vBdPtr->getLastPeriod() + vBdPtr->getPeriod() < millis())
+      {
+        channels[vBdPtr->getChannel(0)] = random(0, 1000);
+        vBdPtr->setLastPeriod(millis());
+      }
+      break;
+      case RANDOM_TRIGGER:
+      if (vBdPtr->getLastPeriod() + vBdPtr->getPeriod() < millis())
+      {
+        channels[vBdPtr->getChannel(0)] = random(0, 1000);
+        vBdPtr->setLastPeriod(millis());
+      }
+      if (vBdPtr->getLastPeriod() + vBdPtr->getPersist() < millis())
+      {
+        channels[vBdPtr->getChannel(0)] = 0;
+      }
+      break;
+      case PERIODIC:
+      if (vBdPtr->getLastPeriod() + vBdPtr->getPeriod() < millis())
+      {
+        channels[vBdPtr->getChannel(0)] = 1000;
+        vBdPtr->setLastPeriod(millis());
+      }
+      if (vBdPtr->getLastPeriod() + vBdPtr->getPersist() < millis())
+      {
+        channels[vBdPtr->getChannel(0)] = 0;
+      }
+      break;
+      case CONSTANT:
+      channels[vBdPtr->getChannel(0)] = vBdPtr->getValue();
+      break;
     }
     vBdPtr = vBdPtr->getNextVBoard();
   }

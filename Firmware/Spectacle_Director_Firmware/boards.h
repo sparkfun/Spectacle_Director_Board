@@ -33,6 +33,10 @@ class VBoard
   uint32_t getPeriod();
   void setPersist(uint32_t persist);
   uint32_t getPersist();
+  void setLastPeriod(uint32_t period);
+  uint32_t getLastPeriod();
+  void setLastPersist(uint32_t persist);
+  uint32_t getLastPersist();
   void setValue(uint16_t value);
   uint16_t getValue();
   void addVBoard(VBoard *nextVBoard);
@@ -41,10 +45,12 @@ class VBoard
   private:
   uint8_t mode;
   uint32_t period;
+  uint32_t lastPeriod;
   uint32_t persist;
+  uint32_t lastPersist;
   uint32_t value;
   uint8_t *channels;
   VBoard *nextVBoard;
 };
-enum {INVERT, AND, OR, XOR, RANDOM, PERIODIC, CONSTANT};
+enum {INVERT, AND, OR, XOR, RANDOM, RANDOM_TRIGGER, PERIODIC, CONSTANT};
 #endif
