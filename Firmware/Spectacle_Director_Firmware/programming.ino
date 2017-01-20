@@ -254,7 +254,7 @@ void loadFile()
     }
     buff[j] = '\0'; // NULL terminate the string
     // Convert the data from an ascii string to an integer value.
-    int temp = atoi(buff);
+    int temp = atol(buff);
     // Configures the current board to a new I2C address. 
     configureBoard(i2c_addr);
     if (temp != checkType(i2c_addr))
@@ -268,7 +268,7 @@ void loadFile()
 
     // Add a new Board object to our linked list of extant boards.
     uint8_t isInput = 0;
-    if (temp >= 128)
+    if (temp >= 128 )
     {
       isInput = 1;
     }
@@ -337,9 +337,11 @@ void loadFile()
       while(progReady(i2c_addr) == 0); // wait for the daughter board to
                                        // signal that it's ready for data
     }
-    // If 'Y', we've reached the end of the configuration data and must break
-    //  from this loop (and, ultimately, from the function).
-    else if (fileBuffer[i] == 'Y')
+    // If 'Y' or 'V', we've reached the end of daughter board data and
+    //  must either break from the function or move on to virtual board
+    //  data parsing.
+    else if (fileBuffer[i] == 'Y' ||
+             fileBuffer[i] == 'V')
     {
       bdPtr->setChannels(channelList);
       bdPtr->setNumChannels(numChannels);
@@ -373,7 +375,7 @@ void loadFile()
         }
         buff[j] = '\0'; // NULL terminate the string
         // Convert the data from an ascii string to an integer value.
-        long temp = atoi(buff);
+        long temp = atol(buff);
         if (remoteAddr == 128) // For the first datapoint in the set, save
                                //  this as a channel number.
         {
@@ -406,7 +408,8 @@ void loadFile()
         i++; // index past the '\n' character
         if (fileBuffer[i] == 'N' ||
             fileBuffer[i] == 'n' ||
-            fileBuffer[i] == 'Y')
+            fileBuffer[i] == 'Y' ||
+            fileBuffer[i] == 'V')
         {
           //Serial1.println(fileBuffer[i]);
           break;
@@ -424,15 +427,160 @@ void loadFile()
       dataIntegrityError();
     }
   }
- /* bdPtr = firstBoard;
-  while (bdPtr != NULL)
+
+  // At this point, fileBuffer[i] should be either V or Y.
+  //  If it's Y, we can quit because we're at the end of the board config
+  //  data. If it's V, however, we have virtual board info to load.
+  if (fileBuffer[i] == 'Y')
   {
-    for (int x = 0; x < bdPtr->getNumChannels(); ++x)
+    return;
+  }
+  else if (fileBuffer[i] == 'V')
+  {
+    // handle virtual board stuff here
+    uint8_t *tempChlList;
+    i+=2; // index past first 'V' character and \n to actual VBoard information.
+    firstVBoard = new VBoard();
+    VBoard *vBrdPtr = firstVBoard;
+    while (1) // We'll break to get out of this loop when we hit 'Y'
     {
-      Serial1.println(bdPtr->getChannel(x));
+      tempChlList = new uint8_t [3];
+      j = 0; // reset the short buffer's index
+      while (fileBuffer[i] != '\n')
+      {
+        buff[j] = fileBuffer[i];
+        j++;
+        i++;
+      }
+      buff[j] = '\0'; // NULL terminate the string
+      tempChlList[0] = atol(buff); // this is the primary source channel number.
+      i++; // index past newline
+      j = 0; // reset the short buffer's index
+      while (fileBuffer[i] != '\n') // Now we're reading the second line of the
+                                    // VBoard config, the mode.
+      {
+        buff[j] = fileBuffer[i];
+        j++;
+        i++;
+      }
+      buff[j] = '\0'; // NULL terminate the string
+      vBrdPtr->setMode(atol(buff));
+      Serial1.println(buff);
+      i++; // index past newline
+      // Here we have a decision to make. While all VBoards have a single channel
+      //  and a mode, after that point they differ. 
+      switch(vBrdPtr->getMode())
+      {
+        case INVERT: // for invert, we only get one more piece of data: the 
+                     //  output channel.
+          j = 0; // reset the short buffer's index
+          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
+                                        // VBoard config, the mode.
+          {
+            buff[j] = fileBuffer[i];
+            j++;
+            i++;
+          }
+          buff[j] = '\0'; // NULL terminate the string
+          tempChlList[1] = atol(buff);
+          i++; // index past newline
+          break;
+        case AND:
+        case OR:
+        case XOR: // These three get TWO channels of info
+          for (int x = 1; x <= 2; ++x)
+          {
+            j = 0; // reset the short buffer's index
+            while (fileBuffer[i] != '\n') // Now we're reading the second line of the
+                                          // VBoard config, the mode.
+            {
+              buff[j] = fileBuffer[i];
+              j++;
+              i++;
+            }
+            buff[j] = '\0'; // NULL terminate the string
+            tempChlList[x] = atol(buff);
+            i++; // index past newline
+          }
+          break;
+        case RANDOM:
+          j = 0;     // reset the short buffer's index
+          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
+                                        // VBoard config, the mode.
+          {
+            buff[j] = fileBuffer[i];
+            j++;
+            i++;
+          }
+          buff[j] = '\0'; // NULL terminate the string
+          vBrdPtr->setPeriod(atol(buff));
+          i++; // index past newline
+        break;
+        case PERIODIC: // for periodic mode, we fetch two uint32_t values, period and persist
+          j = 0;     // reset the short buffer's index
+          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
+                                        // VBoard config, the mode.
+          {
+            buff[j] = fileBuffer[i];
+            j++;
+            i++;
+          }
+          buff[j] = '\0'; // NULL terminate the string
+          vBrdPtr->setPeriod(atol(buff));
+          i++; // index past newline
+          j = 0;     // reset the short buffer's index
+          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
+                                        // VBoard config, the mode.
+          {
+            buff[j] = fileBuffer[i];
+            j++;
+            i++;
+          }
+          buff[j] = '\0'; // NULL terminate the string
+          vBrdPtr->setPersist(atol(buff));
+          i++; // index past newline
+          break;
+        case CONSTANT:
+          j = 0;     // reset the short buffer's index
+          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
+                                        // VBoard config, the mode.
+          {
+            buff[j] = fileBuffer[i];
+            j++;
+            i++;
+          }
+          buff[j] = '\0'; // NULL terminate the string
+          vBrdPtr->setValue(atoi(buff));
+          i++; // index past newline
+          break;
+      }
+      vBrdPtr->setChannels(tempChlList);
+      // At this point, we've gone through the entire virtual board and should either see
+      //  'Y' (for end of file) or 'V' (for next board)
+      if (fileBuffer[i] == 'Y')
+      {
+        vBrdPtr->addVBoard(NULL);
+        break;
+      }
+      else if (fileBuffer[i] == 'V')
+      {
+        //create a new VBoard here
+        VBoard *tempVBoard;
+        tempVBoard = new VBoard();
+        vBrdPtr->addVBoard(tempVBoard);
+        vBrdPtr = tempVBoard;
+      }
+      else
+      {
+        dataIntegrityError();
+      }
     }
-    bdPtr = bdPtr->getNextBoard();
-  }*/
+  }
+  else // ANY OTHER CHARACTER is a data error.
+  {
+    dataIntegrityError();
+  }
+  
 }
 
 void dataIntegrityError()
@@ -505,3 +653,4 @@ uint8_t readAC()
   uint8_t statusa = REG_AC_STATUSA & 0x03 ; 
   return statusa ;
 }
+

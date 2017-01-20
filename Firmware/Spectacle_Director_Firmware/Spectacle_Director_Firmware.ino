@@ -49,6 +49,8 @@ Board *firstBoard;
 Board *lastBoard;
 int16_t channels[64];
 
+VBoard *firstVBoard = NULL;
+
 SerialFlashFile file;
 char fileBuffer[4096];
 char filename[11] = "config.txt";
@@ -143,6 +145,29 @@ void loop()
     }
     bdPtr = bdPtr->getNextBoard(); // Then, go to the next board.
   }
+
+  VBoard *vBdPtr;
+  vBdPtr = firstVBoard;
+  while (vBdPtr != NULL)
+  {
+    switch (vBdPtr->getMode())
+    {
+      case INVERT:
+        vbInvert(vBdPtr->getChannel(0), vBdPtr->getChannel(1));
+        break;
+      case AND:
+        vbAnd(vBdPtr->getChannel(0), vBdPtr->getChannel(1), vBdPtr->getChannel(2));
+      break;
+      case OR:
+        vbOr(vBdPtr->getChannel(0), vBdPtr->getChannel(1), vBdPtr->getChannel(2));
+      break;
+      case XOR:
+        vbXor(vBdPtr->getChannel(0), vBdPtr->getChannel(1), vBdPtr->getChannel(2));
+      break;
+    }
+    vBdPtr = vBdPtr->getNextVBoard();
+  }
+  
   bdPtr = firstBoard;  // Start over at the beginning of the list.
   while (bdPtr != NULL)
   {
