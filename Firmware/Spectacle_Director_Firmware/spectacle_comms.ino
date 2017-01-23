@@ -1,4 +1,19 @@
-int getMail(byte address, byte mailbox)
+/****************************************************************************
+ * spectacle_comms.ino
+ * Spectacle-specific communications functions
+ * Mike Hord @ SparkFun Electronics
+ * 23 Jan 2017
+ * https://github.com/sparkfun/Spectacle_Director_Board
+ * 
+ * These functions are built to provide a front end for commonly used
+ * communications functions within the Spectacle framework
+ * 
+ * This code is beerware; if you see me (or any other SparkFun employee) at the
+ * local, and you've found our code helpful, please buy us a round!
+ * ****************************************************************************/
+
+ // Gets a value on a channel from an input board
+ int getMail(byte address, byte mailbox)
 {
   Wire.beginTransmission(address);
   Wire.write(mailbox * 2);
@@ -10,6 +25,7 @@ int getMail(byte address, byte mailbox)
   return temp;
 }
 
+// Sends a value to a channel used by an output board.
 void sendCmd(byte address,byte offset, uint16_t value)
 {
   Wire.beginTransmission(address);
@@ -47,6 +63,7 @@ byte dataAccepted(byte address)
   return Wire.read();
 }
 
+// Is the board at <address> responding?
 boolean isReady(byte address)
 {
   Wire.requestFrom(address, 1);
@@ -62,6 +79,9 @@ boolean isReady(byte address)
   }
 }
 
+// Check the board type located at <address>. Used to make sure that
+//  the boards that are physically present in the system match those
+//  in the configuration settings.
 int checkType(byte address)
 {
   Wire.beginTransmission(address);

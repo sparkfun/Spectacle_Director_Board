@@ -1,3 +1,20 @@
+/****************************************************************************
+ * boards.h
+ * Daughter and virtual board class header file
+ * Mike Hord @ SparkFun Electronics
+ * 23 Jan 2017
+ * https://github.com/sparkfun/Spectacle_Director_Board
+ * 
+ * This file provides class declarations for the Board and VBoard classes,
+ * which are the implementations of real and virtual boards in a spectacle
+ * system. One object of class Board will be created at runtime for each
+ * daughter board, and one object of class VBoard will be created for each
+ * virtual board.
+ * 
+ * This code is beerware; if you see me (or any other SparkFun employee) at the
+ * local, and you've found our code helpful, please buy us a round!
+ * ****************************************************************************/
+
 #ifndef _boards_h_
 #define _boards_h_
 

@@ -1,4 +1,24 @@
+/****************************************************************************
+ * programming.ino
+ * Read/write daughter board configurations via FSK interface
+ * Mike Hord @ SparkFun Electronics
+ * 23 Jan 2017
+ * https://github.com/sparkfun/Spectacle_Director_Board
+ * 
+ * This file handles receipt of new configuration data from a host via the FSK
+ * interface, storing that data in flash, then retrieving that data at runtime
+ * and using it to program the daughter boards.
+ * 
+ * This code is beerware; if you see me (or any other SparkFun employee) at the
+ * local, and you've found our code helpful, please buy us a round!
+ * ****************************************************************************/
+
 #include "programming.h"
+
+// The author wishes to thank arduino.cc forum user whitlow for posting example
+//  code for using the comparator modules on the SAMD21 chip, without which this
+//  project would have been much more difficult.
+// See https://forum.arduino.cc/index.php?topic=331082.0
 
 // Certain registers in the SAMD21 need synchronization before being
 //  written. These two functions handle that.
@@ -13,15 +33,20 @@ static void syncGCLK() {
   while (GCLK->STATUS.bit.SYNCBUSY == 1);
 }
 
-// variable definitions
+// Variable definisions for analog comparator functionality. We use the
+//  analog comparator to measure the frequency of the data coming in on
+//  the FSK port, then translate that information into a one or a zero.
 uint8_t AC0level  = 16;   // AC0 level
 uint8_t AC1level  = 16;   // AC1 level
 volatile uint8_t ACintflag = 0 ;  // Used to identify AC interupt source
-long lastInt = 0;
-long lastBit = 0;
-long tsli = 0;
-long tslb = 0;
+long lastInt = 0;         // What "time" was the last AC interrupt?
+long lastBit = 0;         // What "time" was the last bit received?
+long tsli = 0;            // How long has it been since the last interrupt?
 
+// Constants for FSK modulation. Hopefully their names are descriptive
+//  enough. Basically, the FSK modulation scheme generates a pulse several
+//  cycles long (based on the baud rate) at CARRIER_FREQ - MOD_FREQ to
+//  represent a zero, or at CARRIER_FREQ + MOD_FREQ to represent a one.
 #define CARRIER_FREQ    4000
 #define MOD_FREQ        1000
 #define BAUD            300
@@ -38,6 +63,7 @@ long tslb = 0;
 #define ONE_BIT_LEN_HI  (1.20*ONE_BIT_LEN)
 #define BIT_LEN         (1000000/BAUD)
 
+// Implements receipt of a new configuration data file from the host via FSK interface.
 void receiveFile()
 {
   setupAC(AC0level, AC1level);
@@ -48,7 +74,6 @@ void receiveFile()
   uint8_t fileSizeIndex = 0;
   uint32_t fileSize = 0;
   
-//  char usbBuffer[USB_BUFFER_SIZE];
   uint8_t flashBuffer[FLASH_BUFFER_SIZE];
   
   uint16_t flashBufferIndex = 0;
@@ -59,7 +84,7 @@ void receiveFile()
   //We assume the serial receive part is finished when we have not received something for 30 seconds
   while((lastReceiveTime + 30000) > millis())
   {
-    uint16_t available; // = Serial1.readBytes(usbBuffer, USB_BUFFER_SIZE);
+    uint16_t available;
     static bool notReceiving = true;
     bool newBit = false;
     static byte bitsReceived = 0;
@@ -72,10 +97,10 @@ void receiveFile()
     if(ACintflag != 0) 
     {
       // Interrupt triggered - so do soemthng (maybe) 
-      tsli = micros() - lastInt;
+      tsli = micros() - lastInt; //How long has it been since the
+                                 // last interrupt?
       lastInt = micros();
       ACintflag = 0;
-      //Serial1.println("ACINT");
 
       if (notReceiving) // Watch for a start bit when not receiving.
       {
@@ -88,19 +113,18 @@ void receiveFile()
         }
       }
 
-      // Recognize a one or zero when received.
+      // Recognize a one or zero when received, IF we know enough time has
+      //  elapsed that we should be receiving a new bit.
       else if (micros() - lastBit > (BIT_LEN))
       {
         if ((tsli > ZERO_BIT_LEN_LO) && (tsli < ZERO_BIT_LEN_HI))
         {
-          //Serial1.println("0");
           bitsReceived++;
           incByte = incByte<<1;
           lastBit = lastInt;
         }
         else if ((tsli > ONE_BIT_LEN_LO) && (tsli < ONE_BIT_LEN_HI))
         {
-          //Serial1.println("1");
           bitsReceived++;
           incByte = incByte<<1 | 1;
           lastBit = lastInt;
@@ -112,7 +136,6 @@ void receiveFile()
       {
         bitsReceived = 0;
         receivedByte = incByte>>2;
-        //Serial1.print((char)receivedByte);
         available = 1;
         incByte = 0;
         notReceiving = true;
@@ -120,10 +143,11 @@ void receiveFile()
     }    
     
     if (state == STATE_DONE) break;
-    
+
+    // if a new data byte came in since last pass, put it into the
+    //  flash buffer.
     if (available)
     {
-      //Serial1.println("DATA");
       available = 0;
       lastReceiveTime = millis();
       uint8_t b = receivedByte;
@@ -131,6 +155,12 @@ void receiveFile()
       if (state == STATE_START)
       {
         file = SerialFlash.open(filename);
+        if (!file)
+        {
+          Serial1.println("File won't open");
+          blinkNum = 14;
+          while(1);
+        }
         state = STATE_CONTENT;
       }
       if (state == STATE_CONTENT)
@@ -165,8 +195,7 @@ void receiveFile()
             {
               while(1)
               {
-                delay(1000);
-                blinkError(8);
+                blinkNum = 16;            // Blink error 8 times.
               }
             }
             lineStart = flashBufferIndex;
@@ -191,6 +220,7 @@ void receiveFile()
 //  data from the flash memory.
 void loadFile()
 {
+  blinkNum = 2;            // While loading, blink once at a go.
   // open the file for reading
   file = SerialFlash.open(filename);
   // catch a file error, although it's very unlikely one could happen
@@ -201,12 +231,13 @@ void loadFile()
     Serial1.println("File didn't open");
     while(1)
     {
-      blinkError(6);
+      blinkNum = 12;             //  Blink 6 times at a go
     }
   }
 
   // Read the file into a largish buffer.
   file.read(fileBuffer, 4096);
+  Serial1.println("File read");
 
   // i will be the index that we use throughout this function to track
   //  where we are in the file buffer.
@@ -612,7 +643,7 @@ void dataIntegrityError()
   {
   Serial1.println("Bad config data!");
   delay(1000);
-  blinkError(4);
+  blinkNum = 8;             // blink the led 4 times at a go.
   }
 }
 

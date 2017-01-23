@@ -1,3 +1,25 @@
+/****************************************************************************
+ * boards.ino
+ * Board and VBoard definition file
+ * Mike Hord @ SparkFun Electronics
+ * 23 Jan 2017
+ * https://github.com/sparkfun/Spectacle_Director_Board
+ * 
+ * This file implements the class functions defined in boards.h. See that
+ * file for more information about the classes and what they're for.
+ * 
+ * Resources:
+ * <additional library requirements>
+ * 
+ * Development environment specifics:
+ * <arduino/development environment version>
+ * <hardware version>
+ * <etc>
+ * 
+ * This code is beerware; if you see me (or any other SparkFun employee) at the
+ * local, and you've found our code helpful, please buy us a round!
+ * ****************************************************************************/
+
 Board::Board(uint8_t input, uint8_t i2cAddr)
 {
   this->input = input;

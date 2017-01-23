@@ -55,6 +55,10 @@ SerialFlashFile file;
 char fileBuffer[4096];
 char filename[11] = "config.txt";
 
+volatile uint32_t shortTick = 0;
+volatile uint8_t  blinkPause = 0;
+volatile uint8_t  blinkNum = 8;
+
 void setup() 
 {
   // Initialize I/O pins
@@ -70,11 +74,13 @@ void setup()
   SERCOM3->I2CM.BAUD.bit.BAUD = 43;              // Set the I2C SCL frequency to 400kHz
   sercom3.enableWIRE();                          // Re-enable I2C bus
 
+
   Serial1.begin(115200);                         // Enable hardware serial port for debugging.
   Serial1.println("Online!");
 
   SerialFlash.begin(MEM_CS);                     // Start the Serialflash library
-  
+  setupTimer();
+  Serial1.println("SFOKAY");
   digitalWrite(VOUT_EN, HIGH);                   // Turn on the power to the daughter boards.
   
   digitalWrite(MEM_RST, LOW);                    // Reset the flash memory controller
@@ -105,7 +111,7 @@ void setup()
     while (!SerialFlash.ready()) 
     {
       Serial1.println("Formatting flash..."); // ...and print a serial message/
-      blinkLED(250);                          // blink the LED twice per second
+      blinkNum = 4;                           // blink LED twice at a time
     }
     Serial1.println("Done formatting flash."); // issue a done message
     SerialFlash.createErasable(filename, 4096); // create the file
@@ -131,6 +137,7 @@ void setup()
 // loop() runs over and over and handles message distribution between daughter boards.
 void loop() 
 {
+  blinkNum = 20;                // During normal operation, blink the LED 10 times at a go.
   Board *bdPtr;                 // Pointer to a board in the linked list of boards.
   bdPtr = firstBoard;           // This pointer starts at the top and is indexed as
   while (bdPtr != NULL)         // we traverse the list in this loop. After the last

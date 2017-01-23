@@ -1,4 +1,4 @@
-void blinkLED(long blinkLen)
+/*void blinkLED(long blinkLen)
 {
   digitalWrite(7, LOW);
   delay(blinkLen);
@@ -12,5 +12,5 @@ void blinkError(int blinks)
   {
     blinkLED(200);
   }
-}
+}*/
 
