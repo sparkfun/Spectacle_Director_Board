@@ -17,10 +17,10 @@
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="21" name="tPlace" color="16" fill="1" visible="yes" active="yes"/>
-<layer number="22" name="bPlace" color="14" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="14" fill="1" visible="no" active="yes"/>
 <layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="no" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="no" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
@@ -34,12 +34,12 @@
 <layer number="42" name="bRestrict" color="1" fill="10" visible="no" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
-<layer number="45" name="Holes" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
 <layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
 <layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
 <layer number="48" name="Document" color="7" fill="1" visible="no" active="yes"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="51" name="tDocu" color="6" fill="1" visible="yes" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="no" active="yes"/>
+<layer number="51" name="tDocu" color="6" fill="1" visible="no" active="yes"/>
 <layer number="52" name="bDocu" color="7" fill="1" visible="no" active="yes"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
 <layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
@@ -789,6 +789,11 @@ Soldermask to be BLACK</text>
 <text x="24.254" y="31" size="0.8128" layer="22" font="vector" ratio="15" rot="MR270" align="top-center">TX</text>
 <text x="24.254" y="29" size="0.8128" layer="22" font="vector" ratio="15" rot="MR270" align="top-center">G</text>
 <text x="24.254" y="27" size="0.8128" layer="22" font="vector" ratio="15" rot="MR270" align="top-center">V</text>
+<wire x1="0.889" y1="8.255" x2="0.508" y2="8.255" width="0.508" layer="22"/>
+<wire x1="0.508" y1="8.255" x2="1.524" y2="9.017" width="0.508" layer="22"/>
+<wire x1="1.524" y1="9.017" x2="1.524" y2="7.493" width="0.508" layer="22"/>
+<wire x1="1.524" y1="7.493" x2="0.508" y2="8.255" width="0.508" layer="22"/>
+<wire x1="3.048" y1="8.255" x2="0.889" y2="8.255" width="0.762" layer="22"/>
 </plain>
 <libraries>
 <library name="SparkFun-Resistors">
