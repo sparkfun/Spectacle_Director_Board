@@ -648,9 +648,7 @@ Jim Lindblom</text>
 <text x="-15.24" y="-34.29" size="1.778" layer="51" font="vector" ratio="15" align="top-left">Silkscreen to be WHITE
 Soldermask to be BLACK</text>
 <text x="1.27" y="43.18" size="1.016" layer="21" font="vector" ratio="15" rot="R90" align="bottom-center">RST</text>
-<text x="1.27" y="32.004" size="1.016" layer="21" font="vector" ratio="15" rot="R90" align="bottom-center">(6)</text>
-<text x="1.27" y="35.56" size="1.016" layer="21" font="vector" ratio="15" rot="R90" align="bottom-center">(7)</text>
-<text x="24.13" y="35.56" size="1.016" layer="21" font="vector" ratio="15" rot="R270" align="bottom-center">(13)</text>
+<text x="1.27" y="32.004" size="1.016" layer="21" font="vector" ratio="15" rot="R90" align="bottom-center">PROG</text>
 <text x="1.27" y="48.26" size="1.016" layer="21" font="vector" ratio="15" rot="R90" align="bottom-center">RX</text>
 <text x="24.13" y="48.26" size="1.016" layer="21" font="vector" ratio="15" rot="R270" align="bottom-center">TX</text>
 <text x="14.478" y="43.688" size="1.016" layer="21" font="vector" ratio="15" rot="R270" align="bottom-center">PWR</text>
