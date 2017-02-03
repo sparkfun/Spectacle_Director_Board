@@ -28,7 +28,7 @@
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
 <layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
-<layer number="39" name="tKeepout" color="16" fill="11" visible="yes" active="yes"/>
+<layer number="39" name="tKeepout" color="16" fill="11" visible="no" active="yes"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="yes"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="yes"/>
 <layer number="42" name="bRestrict" color="1" fill="10" visible="no" active="yes"/>
@@ -165,7 +165,7 @@
 Director Board</text>
 <dimension x1="0" y1="0" x2="0" y2="55.88" x3="-15.24" y3="27.94" textsize="1.778" textratio="15" layer="47" dtype="vertical" width="0.127" unit="inch" precision="3"/>
 <dimension x1="0" y1="0" x2="25.4" y2="0" x3="12.7" y3="-7.62" textsize="1.778" textratio="15" layer="47" dtype="horizontal" width="0.127" unit="inch" precision="3"/>
-<text x="6.985" y="0.3048" size="1.27" layer="16" font="vector" ratio="15" rot="MR0" align="bottom-center">v05</text>
+<text x="6.985" y="0.3048" size="1.27" layer="16" font="vector" ratio="15" rot="MR0" align="bottom-center">v10</text>
 <polygon width="0.2032" layer="22">
 <vertex x="19.496" y="45.031"/>
 <vertex x="19.656" y="45.051"/>
@@ -3587,11 +3587,7 @@ These rules have been curated by SparkFuns DFM commitee. After doing much resear
 <wire x1="13.72" y1="38.604" x2="13.8176" y2="38.5064" width="0.2032" layer="1"/>
 <wire x1="13.8176" y1="38.5064" x2="13.8176" y2="38.4556" width="0.2032" layer="16"/>
 <wire x1="13.8176" y1="38.4556" x2="13.5763" y2="38.2143" width="0.2032" layer="16"/>
-<wire x1="13.5763" y1="38.2143" x2="13.5763" y2="37.3888" width="0.2032" layer="16"/>
 <wire x1="13.0175" y1="34.1376" x2="13.0175" y2="14.5034" width="0.2032" layer="16"/>
-<wire x1="13.0175" y1="34.1376" x2="13.9446" y2="35.0647" width="0.2032" layer="16"/>
-<wire x1="13.9446" y1="35.0647" x2="13.9446" y2="37.0205" width="0.2032" layer="16"/>
-<wire x1="13.9446" y1="37.0205" x2="13.5763" y2="37.3888" width="0.2032" layer="16"/>
 <contactref element="J2" pad="RING1"/>
 <contactref element="D2" pad="1"/>
 <wire x1="13.732" y1="11.11" x2="15.074" y2="11.11" width="0.2032" layer="1"/>
@@ -3602,6 +3598,8 @@ These rules have been curated by SparkFuns DFM commitee. After doing much resear
 <wire x1="6.2" y1="13.41" x2="6.2" y2="12.85" width="0.2032" layer="1"/>
 <wire x1="6.2" y1="12.85" x2="7.94" y2="11.11" width="0.2032" layer="1"/>
 <wire x1="7.94" y1="11.11" x2="13.732" y2="11.11" width="0.2032" layer="1"/>
+<wire x1="13.5763" y1="38.2143" x2="13.5763" y2="34.6964" width="0.2032" layer="16"/>
+<wire x1="13.5763" y1="34.6964" x2="13.0175" y2="34.1376" width="0.2032" layer="16"/>
 </signal>
 <signal name="SCL">
 <contactref element="U2" pad="32"/>
@@ -3610,10 +3608,6 @@ These rules have been curated by SparkFuns DFM commitee. After doing much resear
 <wire x1="13.22" y1="39.81" x2="13.22" y2="38.8232" width="0.2032" layer="1"/>
 <wire x1="13.22" y1="38.8232" x2="12.9032" y2="38.5064" width="0.2032" layer="1"/>
 <wire x1="12.9032" y1="38.5064" x2="13.1953" y2="38.2143" width="0.2032" layer="16"/>
-<wire x1="13.1953" y1="38.2143" x2="13.1953" y2="37.2237" width="0.2032" layer="16"/>
-<wire x1="13.5382" y1="35.2044" x2="12.6365" y2="34.3027" width="0.2032" layer="16"/>
-<wire x1="13.1953" y1="37.2237" x2="13.5382" y2="36.8808" width="0.2032" layer="16"/>
-<wire x1="13.5382" y1="36.8808" x2="13.5382" y2="35.2044" width="0.2032" layer="16"/>
 <contactref element="J2" pad="RING2"/>
 <contactref element="D2" pad="2"/>
 <wire x1="12.6365" y1="14.3129" x2="12.6365" y2="34.3027" width="0.2032" layer="16"/>
@@ -3627,6 +3621,8 @@ These rules have been curated by SparkFuns DFM commitee. After doing much resear
 <wire x1="15.074" y1="9.9323" x2="14.1605" y2="10.8458" width="0.2032" layer="16"/>
 <wire x1="14.1605" y1="10.8458" x2="14.1605" y2="12.7889" width="0.2032" layer="16"/>
 <wire x1="14.1605" y1="12.7889" x2="12.6365" y2="14.3129" width="0.2032" layer="16"/>
+<wire x1="13.1953" y1="38.2143" x2="13.1953" y2="34.8615" width="0.2032" layer="16"/>
+<wire x1="13.1953" y1="34.8615" x2="12.6365" y2="34.3027" width="0.2032" layer="16"/>
 </signal>
 <signal name="RX_LED">
 <contactref element="U2" pad="48"/>
@@ -4093,30 +4089,30 @@ These rules have been curated by SparkFuns DFM commitee. After doing much resear
 <approved hash="19,16,d249ba5535155a1c"/>
 <approved hash="19,16,3264498d3408ab62"/>
 <approved hash="19,16,d249ba5535155a1c"/>
+<approved hash="19,16,16188f984fb44257"/>
 <approved hash="19,16,7988d83d8de5b833"/>
 <approved hash="19,16,7988d83d8de5b833"/>
 <approved hash="19,16,0b268f904f9c5f49"/>
 <approved hash="19,16,7e86c43993e5bd39"/>
 <approved hash="19,16,0b268f904f9c5f49"/>
-<approved hash="19,16,16188f984fb44257"/>
 <approved hash="19,16,e087963f49ab32fb"/>
 <approved hash="19,16,ed1144792520b4ea"/>
 <approved hash="19,16,e087963f49ab32fb"/>
 <approved hash="19,16,e748756a74dfe6fd"/>
 <approved hash="19,16,e242706073d1e1f3"/>
+<approved hash="19,16,e242706073d1e1f3"/>
+<approved hash="19,16,e748756a74dfe6fd"/>
+<approved hash="19,16,e242706073d1e1f3"/>
 <approved hash="19,16,e748756a74dfe6fd"/>
 <approved hash="19,16,2745e353c6b220b8"/>
-<approved hash="19,16,e242706073d1e1f3"/>
-<approved hash="19,16,e242706073d1e1f3"/>
-<approved hash="19,16,e748756a74dfe6fd"/>
 <approved hash="19,16,ff7c6d5e6ecffced"/>
 <approved hash="19,16,e242706073d1e1f3"/>
 <approved hash="19,16,213dd937fef624e0"/>
 <approved hash="19,16,2745e353c6b220b8"/>
-<approved hash="19,16,ed06cc6ac9e6e88a"/>
 <approved hash="19,16,eda6cccac826e94a"/>
-<approved hash="19,16,e306c26ac2e6e38a"/>
+<approved hash="19,16,ed06cc6ac9e6e88a"/>
 <approved hash="19,16,efa6cecad486f5ea"/>
+<approved hash="19,16,e306c26ac2e6e38a"/>
 </errors>
 </board>
 </drawing>

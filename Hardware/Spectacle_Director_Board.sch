@@ -22682,7 +22682,7 @@ This is the "KIT" version, which has limited top masking for improved ease of as
 <plain>
 <text x="99.06" y="154.94" size="1.524" layer="97">600mA out
 6V max in</text>
-<text x="238.76" y="10.16" size="2.54" layer="94" align="top-left">v05</text>
+<text x="238.76" y="10.16" size="2.54" layer="94" align="top-left">v10</text>
 <text x="172.72" y="13.716" size="2.54" layer="94" align="top-left">Mike Hord
 Jim Lindblom</text>
 <text x="93.218" y="132.842" size="1.778" layer="97" rot="MR0">JP1 disables
