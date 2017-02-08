@@ -32,19 +32,19 @@
 #include "boards.h"
 
 #define VOUT_EN A3
-/*
+
 // Defines for prototype boards
 #define MEM_CS  9
 #define MEM_RST 4
 #define SIG_LED 7
 #define LOAD_BTN 6
-*/
+/*
 // Defines for protoboard
 #define MEM_CS  10
 #define MEM_RST A0
 #define SIG_LED 7
 #define LOAD_BTN A1
-
+*/
 Board *firstBoard;
 Board *lastBoard;
 int16_t channels[64];
@@ -100,7 +100,6 @@ void setup()
   Serial1.println(id[4], HEX);
 
   Serial1.println("Setup complete!");
-
   // Our first branch: check to make sure flash file exists and has good data in it.
   //  The file will always be named "config.txt", and stores the configuration for this particular
   //  Spectacle implementation.

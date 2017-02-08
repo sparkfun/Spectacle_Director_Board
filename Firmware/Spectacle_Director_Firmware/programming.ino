@@ -43,26 +43,6 @@ long lastInt = 0;         // What "time" was the last AC interrupt?
 long lastBit = 0;         // What "time" was the last bit received?
 long tsli = 0;            // How long has it been since the last interrupt?
 
-// Constants for FSK modulation. Hopefully their names are descriptive
-//  enough. Basically, the FSK modulation scheme generates a pulse several
-//  cycles long (based on the baud rate) at CARRIER_FREQ - MOD_FREQ to
-//  represent a zero, or at CARRIER_FREQ + MOD_FREQ to represent a one.
-#define CARRIER_FREQ    4000
-#define MOD_FREQ        1000
-#define BAUD            300
-#define CARRIER_LEN     (1000000/CARRIER_FREQ) 
-#define CARRIER_LEN_LO  (0.9*CARRIER_LEN)
-#define CARRIER_LEN_HI  (1.1*CARRIER_LEN)
-#define ZERO_FREQ       (CARRIER_FREQ - MOD_FREQ)
-#define ONE_FREQ        (CARRIER_FREQ + MOD_FREQ)
-#define ZERO_BIT_LEN    (1000000/ZERO_FREQ)
-#define ZERO_BIT_LEN_LO (0.8*ZERO_BIT_LEN)
-#define ZERO_BIT_LEN_HI (1.2*ZERO_BIT_LEN)
-#define ONE_BIT_LEN     (1000000/ONE_FREQ)
-#define ONE_BIT_LEN_LO  (0.8*ONE_BIT_LEN)
-#define ONE_BIT_LEN_HI  (1.20*ONE_BIT_LEN)
-#define BIT_LEN         (1000000/BAUD)
-
 // Implements receipt of a new configuration data file from the host via FSK interface.
 void receiveFile()
 {
@@ -96,6 +76,7 @@ void receiveFile()
   
     if(ACintflag != 0) 
     {
+      blinkNum = 12;
       // Interrupt triggered - so do soemthng (maybe) 
       tsli = micros() - lastInt; //How long has it been since the
                                  // last interrupt?
@@ -189,13 +170,14 @@ void receiveFile()
             {
               checksum = checksum + flashBuffer[i];
             }
-            Serial1.println(b);
-            Serial1.println(checksum);
+            //Serial1.println(b);
+            //Serial1.println(checksum);
             if (checksum != b)
             {
               while(1)
               {
                 blinkNum = 16;            // Blink error 8 times.
+                while(1);
               }
             }
             lineStart = flashBufferIndex;
@@ -250,8 +232,10 @@ void loadFile()
   while (fileBuffer[i] != '\n')
   {
     buff[i] = fileBuffer[i];
+
     i++;
   }
+  digitalWrite(SIG_LED, HIGH);
   
   buff[i] = '\0';    // NULL terminate buff 
   i++;               // Index past the first newline in the buffer
@@ -496,7 +480,7 @@ void loadFile()
       }
       buff[j] = '\0'; // NULL terminate the string
       vBrdPtr->setMode(atol(buff));
-      Serial1.println(buff);
+      //Serial1.println(buff);
       i++; // index past newline
       // Here we have a decision to make. While all VBoards have a single channel
       //  and a mode, after that point they differ. 
@@ -643,14 +627,9 @@ void dataIntegrityError()
   {
   Serial1.println("Bad config data!");
   delay(1000);
-  blinkNum = 8;             // blink the led 4 times at a go.
+  blinkNum = 10;             // blink the led 4 times at a go.
   }
 }
-
-//##############################################################
-//  This is the interrupt handler. The name is fixed, but you can
-//  do what you like in here
-//##############################################################
 
 void AC_Handler()
 {
@@ -673,11 +652,9 @@ void setupAC(uint8_t AC0level, uint8_t AC1level )
   REG_PM_APBCMASK |= PM_APBCMASK_AC;        // Set the AC bit in the APBCMASK register
   REG_AC_CTRLA = 0x00;      // Disable comparator(s)
   ACsync();
-  REG_AC_COMPCTRL0 = 0x00083524;  // MUXPOS = AIN3 pin int on rising
+  REG_AC_COMPCTRL0 = 0x00081524;  // MUXPOS = AIN1 pin int on rising
   ACsync();
-  REG_AC_COMPCTRL1 = 0x00082524;  // MUXPOS = AIN2  pin, int on rising
-  ACsync();
-  REG_AC_INTENSET = 0x03;   // Both AC generate an interrupt
+  REG_AC_INTENSET = 0x01;   // AC0 generates an interrupt
   REG_AC_WINCTRL = 0x00;    // Single comparator modes
   ACsync();
   REG_AC_SCALER0 = AC0level;    // Set threshold level
@@ -686,9 +663,7 @@ void setupAC(uint8_t AC0level, uint8_t AC1level )
   NVIC_EnableIRQ(AC_IRQn);  // Enable intrupt vector
   ACsync();
   REG_AC_COMPCTRL0 |= 0x00001;
-   ACsync();
-  REG_AC_COMPCTRL1 |= 0x00001;
-   ACsync();
+  ACsync();
   REG_AC_CTRLA = 0x02;      // Enable comparator(s)
   ACsync();
   REG_AC_INTFLAG = 0x03;  // Reset the interupts by writing  1s

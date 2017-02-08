@@ -80,7 +80,7 @@ void TC4_Handler()              // Interrupt Service Routine (ISR) for timer TC4
       }
       else if (blinkPause < blinkNum + 4)
       {
-        digitalWrite(7, HIGH);
+        digitalWrite(7, LOW);
       }
       else
       {
