@@ -45,19 +45,19 @@
 #define SIG_LED 7
 #define LOAD_BTN A1
 */
-Board *firstBoard;
+Board *firstBoard = NULL;
 Board *lastBoard;
 int16_t channels[64];
 
 VBoard *firstVBoard = NULL;
 
 SerialFlashFile file;
-char fileBuffer[4096];
+char fileBuffer[8192];
 char filename[11] = "config.txt";
 
 volatile uint32_t shortTick = 0;
 volatile uint8_t  blinkPause = 0;
-volatile uint8_t  blinkNum = 8;
+volatile uint8_t  blinkNum = 4;
 
 void setup() 
 {
@@ -73,7 +73,6 @@ void setup()
   sercom3.disableWIRE();                         // Disable the I2C bus
   SERCOM3->I2CM.BAUD.bit.BAUD = 43;              // Set the I2C SCL frequency to 400kHz
   sercom3.enableWIRE();                          // Re-enable I2C bus
-
 
   Serial1.begin(115200);                         // Enable hardware serial port for debugging.
   Serial1.println("Online!");
@@ -139,6 +138,7 @@ void loop()
   blinkNum = 20;                // During normal operation, blink the LED 10 times at a go.
   Board *bdPtr;                 // Pointer to a board in the linked list of boards.
   bdPtr = firstBoard;           // This pointer starts at the top and is indexed as
+  
   while (bdPtr != NULL)         // we traverse the list in this loop. After the last
   {                             // board, the pointer will be to NULL, and we start over.
     if (bdPtr->isInput() == 1)  // If the board is an input board (determined at object
@@ -151,7 +151,7 @@ void loop()
     }
     bdPtr = bdPtr->getNextBoard(); // Then, go to the next board.
   }
-
+  
   VBoard *vBdPtr;
   vBdPtr = firstVBoard;
   while (vBdPtr != NULL)
@@ -219,6 +219,7 @@ void loop()
     }
     bdPtr = bdPtr->getNextBoard();
   }
+  
   delay(25);
 }
 

@@ -82,7 +82,7 @@ boolean isReady(byte address)
 // Check the board type located at <address>. Used to make sure that
 //  the boards that are physically present in the system match those
 //  in the configuration settings.
-int checkType(byte address)
+byte checkType(byte address)
 {
   Wire.beginTransmission(address);
   Wire.write(0xff);

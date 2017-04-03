@@ -36,7 +36,7 @@ static void syncGCLK() {
 // Variable definisions for analog comparator functionality. We use the
 //  analog comparator to measure the frequency of the data coming in on
 //  the FSK port, then translate that information into a one or a zero.
-uint8_t AC0level  = 16;   // AC0 level
+uint8_t AC0level  = 28;   // AC0 level
 uint8_t AC1level  = 16;   // AC1 level
 volatile uint8_t ACintflag = 0 ;  // Used to identify AC interupt source
 long lastInt = 0;         // What "time" was the last AC interrupt?
@@ -76,7 +76,7 @@ void receiveFile()
   
     if(ACintflag != 0) 
     {
-      blinkNum = 12;
+      blinkNum = 6;
       // Interrupt triggered - so do soemthng (maybe) 
       tsli = micros() - lastInt; //How long has it been since the
                                  // last interrupt?
@@ -218,14 +218,14 @@ void loadFile()
   }
 
   // Read the file into a largish buffer.
-  file.read(fileBuffer, 4096);
+  file.read(fileBuffer, 8192);
   Serial1.println("File read");
 
   // i will be the index that we use throughout this function to track
   //  where we are in the file buffer.
   int i = 0;
   // buff is a short buffer that we'll operate on as we parse the file.
-  char buff[12];
+  char buff[18];
 
   // Read the first line of the file and check to see if it matches the
   //  expected value (should read "SPEC")
@@ -234,8 +234,12 @@ void loadFile()
     buff[i] = fileBuffer[i];
 
     i++;
+    if (i >= 5)   // If the input gets scrambled, we may *never* find
+    {             //  a newline. In that case, STOP LOOKING!
+      Serial1.println("Failed to find SPEC");
+      while(1);
+    }
   }
-  digitalWrite(SIG_LED, HIGH);
   
   buff[i] = '\0';    // NULL terminate buff 
   i++;               // Index past the first newline in the buffer
@@ -257,7 +261,7 @@ void loadFile()
   // i2c_addr will be incremented with each new board that comes
   //  online. We'll connect to the board, assign it a new I2C address,
   //  then check that it matches the expected board ID from the file.
-  int i2c_addr = 0x09;
+  byte i2c_addr = 0x09;
   while (1)
   {
     // Read one line into the short buffer.
@@ -266,15 +270,23 @@ void loadFile()
       buff[j] = fileBuffer[i];
       j++;
       i++;
+      if (j >= 5)   // If the input gets scrambled, we may *never* find
+      {             //  a newline. In that case, STOP LOOKING!
+        Serial1.println("Failed to find board ID");
+        while(1);
+      }
     }
     buff[j] = '\0'; // NULL terminate the string
     // Convert the data from an ascii string to an integer value.
     int temp = atol(buff);
+    Serial1.println(temp);
     // Configures the current board to a new I2C address. 
     configureBoard(i2c_addr);
     if (temp != checkType(i2c_addr))
     {
       Serial1.println("Board type does not match!");
+      Serial1.println(checkType(i2c_addr));
+      while(1);
     }
     else
     {
@@ -290,6 +302,7 @@ void loadFile()
     if (i2c_addr == 0x09) // first time through this loop
     {
       firstBoard = new Board(isInput, i2c_addr);
+      firstBoard->addBoard(NULL);
       lastBoard = firstBoard;
     }
     else // subsequent passes through this loop
@@ -303,7 +316,10 @@ void loadFile()
     i++; // index past the newline
     i2c_addr++;
     j=0;
-    if (fileBuffer[i] == 'B') break;
+    if (fileBuffer[i] == 'B') 
+    {
+      break;
+    }
   }
   
   i += 2; // index past 'B' and '\n'. We should now be looking at the first
@@ -433,7 +449,7 @@ void loadFile()
       sendByte(i2c_addr, DATA_READY_REG, 1); // tell daughter board we've got
                                              //  a config set for it.
       //Serial1.println("waiting for daughter board");
-      while (dataAccepted(i2c_addr) == 1); // Wait for data to be accepted by
+      while (dataAccepted(i2c_addr) == 1) {Serial1.println("Waiting for DB");} // Wait for data to be accepted by
                                             //  daughter board.
     }
     // ANY OTHER CHARACTER indicates a data integrity error.
@@ -459,6 +475,7 @@ void loadFile()
     VBoard *vBrdPtr = firstVBoard;
     while (1) // We'll break to get out of this loop when we hit 'Y'
     {
+      i+=2;  // Skip over the length and decimal strings
       tempChlList = new uint8_t [3];
       j = 0; // reset the short buffer's index
       while (fileBuffer[i] != '\n')
@@ -469,7 +486,8 @@ void loadFile()
       }
       buff[j] = '\0'; // NULL terminate the string
       tempChlList[0] = atol(buff); // this is the primary source channel number.
-      i++; // index past newline
+      Serial1.println(buff);
+      i+=3; // index past newline, length byte and decimal point
       j = 0; // reset the short buffer's index
       while (fileBuffer[i] != '\n') // Now we're reading the second line of the
                                     // VBoard config, the mode.
@@ -480,8 +498,8 @@ void loadFile()
       }
       buff[j] = '\0'; // NULL terminate the string
       vBrdPtr->setMode(atol(buff));
-      //Serial1.println(buff);
-      i++; // index past newline
+      Serial1.println(buff);
+      i+=3; // index past newline, length byte, and decimal point
       // Here we have a decision to make. While all VBoards have a single channel
       //  and a mode, after that point they differ. 
       switch(vBrdPtr->getMode())
@@ -506,8 +524,7 @@ void loadFile()
           for (int x = 1; x <= 2; ++x)
           {
             j = 0; // reset the short buffer's index
-            while (fileBuffer[i] != '\n') // Now we're reading the second line of the
-                                          // VBoard config, the mode.
+            while (fileBuffer[i] != '\n')
             {
               buff[j] = fileBuffer[i];
               j++;
@@ -515,13 +532,13 @@ void loadFile()
             }
             buff[j] = '\0'; // NULL terminate the string
             tempChlList[x] = atol(buff);
-            i++; // index past newline
+            i+=3; // index past newline
           }
+          i-=2;
           break;
         case RANDOM:
           j = 0;     // reset the short buffer's index
-          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
-                                        // VBoard config, the mode.
+          while (fileBuffer[i] != '\n') 
           {
             buff[j] = fileBuffer[i];
             j++;
@@ -533,10 +550,8 @@ void loadFile()
           i++; // index past newline
         break;
         case RANDOM_TRIGGER:
-        
           j = 0;     // reset the short buffer's index
-          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
-                                        // VBoard config, the mode.
+          while (fileBuffer[i] != '\n') 
           {
             buff[j] = fileBuffer[i];
             j++;
@@ -550,8 +565,7 @@ void loadFile()
         break;
         case PERIODIC: // for periodic mode, we fetch two uint32_t values, period and persist
           j = 0;     // reset the short buffer's index
-          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
-                                        // VBoard config, the mode.
+          while (fileBuffer[i] != '\n')
           {
             buff[j] = fileBuffer[i];
             j++;
@@ -559,11 +573,11 @@ void loadFile()
           }
           buff[j] = '\0'; // NULL terminate the string
           vBrdPtr->setPeriod(atol(buff));
+          Serial1.println(buff);
           vBrdPtr->setLastPeriod(0);
-          i++; // index past newline
+          i+=3; // index past newline, length, and decimal point
           j = 0;     // reset the short buffer's index
-          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
-                                        // VBoard config, the mode.
+          while (fileBuffer[i] != '\n')
           {
             buff[j] = fileBuffer[i];
             j++;
@@ -571,12 +585,12 @@ void loadFile()
           }
           buff[j] = '\0'; // NULL terminate the string
           vBrdPtr->setPersist(atol(buff));
+          Serial1.println(buff);
           i++; // index past newline
           break;
         case CONSTANT:
           j = 0;     // reset the short buffer's index
-          while (fileBuffer[i] != '\n') // Now we're reading the second line of the
-                                        // VBoard config, the mode.
+          while (fileBuffer[i] != '\n') 
           {
             buff[j] = fileBuffer[i];
             j++;
@@ -627,7 +641,7 @@ void dataIntegrityError()
   {
   Serial1.println("Bad config data!");
   delay(1000);
-  blinkNum = 10;             // blink the led 4 times at a go.
+  blinkNum = 10;             // blink the led 5 times at a go.
   }
 }
 
